@@ -559,12 +559,17 @@ def enrich_map_graph(data):
 def build_html(data):
     """Generate the self-contained HTML file."""
     data_json = json.dumps(data, ensure_ascii=False, indent=None)
+    # Prevent </script> injection and HTML entity issues in inline script
+    data_json = data_json.replace('<', '\\u003c')
+    data_json = data_json.replace('>', '\\u003e')
+    data_json = data_json.replace('&', '\\u0026')
 
     html = r'''<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src 'self' data: blob:;">
 <title>The Isofarian Guard 2E - Companion</title>
 <style>
 :root {
@@ -893,7 +898,8 @@ a:hover { text-decoration: underline; color: #90caf9; }
 const DATA = ''' + data_json + r''';
 
 // --- Utility ---
-function esc(s) { if (!s) return ''; return s.replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+function esc(s) { if (!s) return ''; return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+function escJs(s) { if (!s) return ''; return String(s).replace(/\\/g,'\\\\').replace(/'/g,"\\'").replace(/"/g,'\\"').replace(/\n/g,'\\n'); }
 
 function formatCost(s) {
   if (!s || s === '-') return s || '';
@@ -1014,7 +1020,7 @@ function showDetail(type, identifier) {
         html += '<div class="section-label">Material Drops</div><div class="tag-list">';
         e.materialDrops.forEach(d => {
           let matName = d.includes('(') ? d.substring(0, d.indexOf('(')).trim() : d;
-          html += '<a class="tag" onclick="showDetail(\'material\',\'' + esc(matName).replace(/'/g,"\\'") + '\')">' + esc(d) + '</a>';
+          html += '<a class="tag" onclick="showDetail(\'material\',\'' + escJs(matName) + '\')">' + esc(d) + '</a>';
         });
         html += '</div>';
       }
@@ -1059,22 +1065,22 @@ function showDetail(type, identifier) {
 
     // Cost
     html += '<div class="stat-row" style="margin-top:8px;">';
-    if (item.craftCost && item.craftCost !== '-') html += '<span class="stat lux"><span class="stat-label">Craft</span><span class="stat-value">' + formatCost(item.craftCost) + '</span></span>';
-    if (item.sellPrice && item.sellPrice !== '-') html += '<span class="stat silver"><span class="stat-label">Sell</span><span class="stat-value">' + formatCost(item.sellPrice) + '</span></span>';
-    if (item.luxCost && item.luxCost !== '-') html += '<span class="stat lux"><span class="stat-label">Lux</span><span class="stat-value">' + formatCost(item.luxCost) + '</span></span>';
+    if (item.craftCost && item.craftCost !== '-') html += '<span class="stat lux"><span class="stat-label">Craft</span><span class="stat-value">' + esc(formatCost(item.craftCost)) + '</span></span>';
+    if (item.sellPrice && item.sellPrice !== '-') html += '<span class="stat silver"><span class="stat-label">Sell</span><span class="stat-value">' + esc(formatCost(item.sellPrice)) + '</span></span>';
+    if (item.luxCost && item.luxCost !== '-') html += '<span class="stat lux"><span class="stat-label">Lux</span><span class="stat-value">' + esc(formatCost(item.luxCost)) + '</span></span>';
     html += '</div>';
 
     // Prerequisite
     if (item.prerequisite) {
       html += '<h3>Prerequisite Equipment</h3>';
-      html += '<a class="tag craft" onclick="showDetail(\'craft\',\'' + esc(item.prerequisite).replace(/'/g,"\\'") + '\')">' + esc(item.prerequisite) + '</a>';
+      html += '<a class="tag craft" onclick="showDetail(\'craft\',\'' + escJs(item.prerequisite) + '\')">' + esc(item.prerequisite) + '</a>';
 
       // Show chain
       let chain = findPrereqChain(item.name);
       if (chain && chain.length > 1) {
         html += '<div class="prereq-chain">';
         chain.forEach((c, i) => {
-          html += '<a class="chain-item" onclick="showDetail(\'craft\',\'' + esc(c.name).replace(/'/g,"\\'") + '\')">' + esc(c.name) + ' ' + ratingStars(c.rating) + '</a>';
+          html += '<a class="chain-item" onclick="showDetail(\'craft\',\'' + escJs(c.name) + '\')">' + esc(c.name) + ' ' + ratingStars(c.rating) + '</a>';
           if (i < chain.length - 1) html += '<span class="chain-arrow">&rarr;</span>';
         });
         html += '</div>';
@@ -1091,7 +1097,7 @@ function showDetail(type, identifier) {
     if (item.speakingStone) {
       html += '<h3>Speaking Stone Required</h3>';
       let stName = item.speakingStone.replace(/\s*x\d+/i, '').trim();
-      html += '<a class="tag item" onclick="showDetail(\'stone\',\'' + esc(stName).replace(/'/g,"\\'") + '\')">' + esc(item.speakingStone) + '</a>';
+      html += '<a class="tag item" onclick="showDetail(\'stone\',\'' + escJs(stName) + '\')">' + esc(item.speakingStone) + '</a>';
     }
 
     // Crafting materials
@@ -1105,7 +1111,7 @@ function showDetail(type, identifier) {
           let source = '';
           if (materialToEnemies[mat]) {
             let names = [...new Set(materialToEnemies[mat].map(e => e.name))];
-            source = names.map(n => '<a onclick="showDetail(\'enemy\',\'' + esc(n).replace(/'/g,"\\'") + '\')" style="color:var(--red)">' + esc(n) + '</a>').join(', ');
+            source = names.map(n => '<a onclick="showDetail(\'enemy\',\'' + escJs(n) + '\')" style="color:var(--red)">' + esc(n) + '</a>').join(', ');
           }
           if (materialToMarket[mat]) {
             if (source) source += ' | ';
@@ -1115,7 +1121,7 @@ function showDetail(type, identifier) {
             if (source) source += ' | ';
             source += '<span style="color:var(--orange)">Nodes: ' + esc(DATA.harvestLocations[mat]) + '</span>';
           }
-          html += '<tr><td><a onclick="showDetail(\'material\',\'' + esc(mat).replace(/'/g,"\\'") + '\')">' + esc(mat) + '</a></td>';
+          html += '<tr><td><a onclick="showDetail(\'material\',\'' + escJs(mat) + '\')">' + esc(mat) + '</a></td>';
           html += '<td>' + esc(info.qty || info) + '</td><td>' + esc(info.rep2 || info['2R'] || '') + '</td>';
           html += '<td style="font-size:0.8rem;">' + (source || '-') + '</td></tr>';
         });
@@ -1129,7 +1135,7 @@ function showDetail(type, identifier) {
 
     // Plan Route link
     if (hasMats) {
-      html += '<div style="margin-top:14px;"><a class="rp-btn rp-btn-primary" style="text-decoration:none;" onclick="planRouteFor(\'' + esc(item.name).replace(/'/g,"\\'") + '\')">Plan Route</a></div>';
+      html += '<div style="margin-top:14px;"><a class="rp-btn rp-btn-primary" style="text-decoration:none;" onclick="planRouteFor(\'' + escJs(item.name) + '\')">Plan Route</a></div>';
     }
 
     content.innerHTML = html;
@@ -1148,7 +1154,7 @@ function showDetail(type, identifier) {
       });
       Object.entries(uniqueEnemies).forEach(([name, entries]) => {
         html += '<div style="margin-bottom:8px;padding:8px;background:var(--bg);border-radius:4px;">';
-        html += '<a onclick="showDetail(\'enemy\',\'' + esc(name).replace(/'/g,"\\'") + '\')" style="font-weight:600;color:var(--red);">' + esc(name) + '</a>';
+        html += '<a onclick="showDetail(\'enemy\',\'' + escJs(name) + '\')" style="font-weight:600;color:var(--red);">' + esc(name) + '</a>';
         html += '<div style="font-size:0.82rem;color:var(--text2);margin-top:4px;">';
         entries.forEach(e => {
           let locs = Object.values(e.locations).join(', ');
@@ -1183,7 +1189,7 @@ function showDetail(type, identifier) {
       html += '<h3>Used to Craft</h3>';
       html += '<div class="tag-list" style="gap:6px;">';
       materialToCraft[identifier].forEach(c => {
-        html += '<a class="tag craft" onclick="showDetail(\'craft\',\'' + esc(c.name).replace(/'/g,"\\'") + '\')">' + esc(c.name) + '</a>';
+        html += '<a class="tag craft" onclick="showDetail(\'craft\',\'' + escJs(c.name) + '\')">' + esc(c.name) + '</a>';
       });
       html += '</div>';
     }
@@ -1210,7 +1216,7 @@ function showDetail(type, identifier) {
       html += '<h3>Used to Craft</h3>';
       html += '<div class="tag-list" style="gap:6px;">';
       materialToCraft[identifier].forEach(c => {
-        html += '<a class="tag craft" onclick="showDetail(\'craft\',\'' + esc(c.name).replace(/'/g,"\\'") + '\')">' + esc(c.name) + '</a>';
+        html += '<a class="tag craft" onclick="showDetail(\'craft\',\'' + escJs(c.name) + '\')">' + esc(c.name) + '</a>';
       });
       html += '</div>';
     }
@@ -1248,7 +1254,7 @@ function renderEnemies(filter, search) {
   let html = '';
   Object.entries(grouped).forEach(([name, entries]) => {
     html += '<div class="card">';
-    html += '<div class="card-title"><a onclick="showDetail(\'enemy\',\'' + esc(name).replace(/'/g,"\\'") + '\')">' + esc(name) + '</a></div>';
+    html += '<div class="card-title"><a onclick="showDetail(\'enemy\',\'' + escJs(name) + '\')">' + esc(name) + '</a></div>';
 
     entries.forEach(e => {
       html += '<div style="margin-bottom:6px;">';
@@ -1264,7 +1270,7 @@ function renderEnemies(filter, search) {
         html += '<div class="tag-list">';
         e.materialDrops.forEach(d => {
           let matName = d.includes('(') ? d.substring(0, d.indexOf('(')).trim() : d;
-          html += '<a class="tag" onclick="event.stopPropagation();showDetail(\'material\',\'' + esc(matName).replace(/'/g,"\\'") + '\')">' + esc(d) + '</a>';
+          html += '<a class="tag" onclick="event.stopPropagation();showDetail(\'material\',\'' + escJs(matName) + '\')">' + esc(d) + '</a>';
         });
         html += '</div>';
       }
@@ -1326,7 +1332,7 @@ function renderAccessories(typeFilter, search) {
 
 function renderCraftCard(item, type) {
   let html = '<div class="card">';
-  html += '<div class="card-title"><a onclick="showDetail(\'craft\',\'' + esc(item.name).replace(/'/g,"\\'") + '\')">' + esc(item.name) + '</a>';
+  html += '<div class="card-title"><a onclick="showDetail(\'craft\',\'' + escJs(item.name) + '\')">' + esc(item.name) + '</a>';
   if (item.rating) html += ' ' + ratingStars(item.rating);
   html += '</div>';
 
@@ -1340,8 +1346,8 @@ function renderCraftCard(item, type) {
   if (item.statIncrease) html += '<span class="stat"><span class="stat-label">Stat</span><span class="stat-value">' + esc(item.statIncrease) + '</span></span>';
   if (item.stoneSlots) html += '<span class="stat"><span class="stat-label">Slots</span><span class="stat-value">' + esc(item.stoneSlots) + '</span></span>';
   if (item.bonusChip) html += '<span class="stat"><span class="stat-label">Bonus</span><span class="stat-value">' + esc(item.bonusChip) + '</span></span>';
-  if (item.craftCost && item.craftCost !== '-') html += '<span class="stat lux"><span class="stat-label">Craft</span><span class="stat-value">' + formatCost(item.craftCost) + '</span></span>';
-  if (item.luxCost && item.luxCost !== '-') html += '<span class="stat lux"><span class="stat-label">Lux</span><span class="stat-value">' + formatCost(item.luxCost) + '</span></span>';
+  if (item.craftCost && item.craftCost !== '-') html += '<span class="stat lux"><span class="stat-label">Craft</span><span class="stat-value">' + esc(formatCost(item.craftCost)) + '</span></span>';
+  if (item.luxCost && item.luxCost !== '-') html += '<span class="stat lux"><span class="stat-label">Lux</span><span class="stat-value">' + esc(formatCost(item.luxCost)) + '</span></span>';
   html += '</div>';
 
   if (item.effect) {
@@ -1350,7 +1356,7 @@ function renderCraftCard(item, type) {
 
   if (item.prerequisite) {
     html += '<div class="section-label">Requires</div>';
-    html += '<a class="tag craft" onclick="event.stopPropagation();showDetail(\'craft\',\'' + esc(item.prerequisite).replace(/'/g,"\\'") + '\')">' + esc(item.prerequisite) + '</a>';
+    html += '<a class="tag craft" onclick="event.stopPropagation();showDetail(\'craft\',\'' + escJs(item.prerequisite) + '\')">' + esc(item.prerequisite) + '</a>';
   }
 
   // Show materials compactly
@@ -1365,7 +1371,7 @@ function renderCraftCard(item, type) {
     html += '<div class="section-label">Materials</div><div class="tag-list">';
     mats.forEach(m => {
       let baseName = m.replace(/\s*x\d+.*/i, '').replace(/\s*\(.*/,'').trim();
-      html += '<a class="tag" onclick="event.stopPropagation();showDetail(\'material\',\'' + esc(baseName).replace(/'/g,"\\'") + '\')">' + esc(m) + '</a>';
+      html += '<a class="tag" onclick="event.stopPropagation();showDetail(\'material\',\'' + escJs(baseName) + '\')">' + esc(m) + '</a>';
     });
     html += '</div>';
   }
@@ -1386,7 +1392,7 @@ function renderMarket() {
   html += '</tr></thead><tbody>';
 
   DATA.market.forEach(item => {
-    html += '<tr><td><a onclick="showDetail(\'material\',\'' + esc(item.name).replace(/'/g,"\\'") + '\')" style="font-weight:600;">' + esc(item.name) + '</a></td>';
+    html += '<tr><td><a onclick="showDetail(\'material\',\'' + escJs(item.name) + '\')" style="font-weight:600;">' + esc(item.name) + '</a></td>';
     html += '<td style="font-size:0.8rem;color:var(--text2);max-width:200px;">' + esc(item.effect) + '</td>';
     towns.forEach(t => {
       let p = item.prices[t] || {};
@@ -1417,7 +1423,7 @@ function renderBuildings() {
     if (mats.length) {
       html += '<div class="section-label">Resources Needed</div><div class="tag-list">';
       mats.forEach(m => {
-        html += '<a class="tag" onclick="showDetail(\'material\',\'' + esc(m.name).replace(/'/g,"\\'") + '\')">' + esc(m.name) + ' x' + esc(m.qty) + '</a>';
+        html += '<a class="tag" onclick="showDetail(\'material\',\'' + escJs(m.name) + '\')">' + esc(m.name) + ' x' + esc(m.qty) + '</a>';
       });
       html += '</div>';
     }
@@ -1430,7 +1436,7 @@ function renderBuildings() {
   html += '<h3 style="color:var(--gold);margin-top:20px;margin-bottom:10px;">Harvesting & Mining Locations</h3>';
   html += '<table class="recipe-table"><tr><th>Resource</th><th>Nodes</th><th>Lux Cost (x4)</th></tr>';
   Object.entries(DATA.harvestLocations).forEach(([mat, locs]) => {
-    html += '<tr><td><a onclick="showDetail(\'material\',\'' + esc(mat).replace(/'/g,"\\'") + '\')">' + esc(mat) + '</a></td>';
+    html += '<tr><td><a onclick="showDetail(\'material\',\'' + escJs(mat) + '\')">' + esc(mat) + '</a></td>';
     html += '<td style="color:var(--green)">' + esc(locs) + '</td>';
     html += '<td style="color:var(--gold)">' + esc(DATA.resourceLuxCosts[mat] || '-') + '</td></tr>';
   });
@@ -1447,7 +1453,7 @@ function renderStones() {
   grid.innerHTML = DATA.speakingStones.map(s => {
     let clr = colorMap[s.color] || 'var(--text)';
     let html = '<div class="card">';
-    html += '<div class="card-title"><a onclick="showDetail(\'stone\',\'' + esc(s.name).replace(/'/g,"\\'") + '\')" style="color:' + clr + '">' + esc(s.name) + '</a></div>';
+    html += '<div class="card-title"><a onclick="showDetail(\'stone\',\'' + escJs(s.name) + '\')" style="color:' + clr + '">' + esc(s.name) + '</a></div>';
     html += '<div class="card-subtitle">' + esc(s.element) + ' | ' + esc(s.color) + ' | x' + esc(s.available) + '</div>';
     html += '<div style="padding:6px;background:var(--bg);border-radius:4px;font-size:0.9rem;">' + esc(s.bonus) + '</div>';
     if (s.lapidaryExchange) {
@@ -1458,7 +1464,7 @@ function renderStones() {
     if (materialToCraft[s.name]) {
       html += '<div class="section-label">Used In</div><div class="tag-list">';
       materialToCraft[s.name].forEach(c => {
-        html += '<a class="tag craft" onclick="event.stopPropagation();showDetail(\'craft\',\'' + esc(c.name).replace(/'/g,"\\'") + '\')">' + esc(c.name) + '</a>';
+        html += '<a class="tag craft" onclick="event.stopPropagation();showDetail(\'craft\',\'' + escJs(c.name) + '\')">' + esc(c.name) + '</a>';
       });
       html += '</div>';
     }
@@ -1472,7 +1478,7 @@ function renderMaterialIndex() {
   const container = document.getElementById('material-index');
   const mats = getAllMaterials();
   container.innerHTML = mats.map(m =>
-    '<a class="tag" onclick="showDetail(\'material\',\'' + esc(m).replace(/'/g,"\\'") + '\')" style="font-size:0.9rem;padding:6px 12px;">' + esc(m) + '</a>'
+    '<a class="tag" onclick="showDetail(\'material\',\'' + escJs(m) + '\')" style="font-size:0.9rem;padding:6px 12px;">' + esc(m) + '</a>'
   ).join('');
 }
 
@@ -1599,6 +1605,20 @@ const RP = {
   hoverNode: null,
 };
 
+function rpValidateGraph(g) {
+  if (!g || typeof g !== 'object') return false;
+  if (!g.nodes || typeof g.nodes !== 'object') return false;
+  if (!Array.isArray(g.edges)) return false;
+  for (const [nid, n] of Object.entries(g.nodes)) {
+    if (typeof n.x !== 'number' || typeof n.y !== 'number') return false;
+    if (n.name !== undefined && typeof n.name !== 'string') return false;
+  }
+  for (const e of g.edges) {
+    if (!Array.isArray(e) || e.length !== 2) return false;
+  }
+  return true;
+}
+
 function rpInit() {
   if (RP.initialized) { rpResize(); rpDraw(); return; }
   RP.initialized = true;
@@ -1607,7 +1627,10 @@ function rpInit() {
   // Load graph from localStorage or embedded data
   const saved = localStorage.getItem('tig_map_graph');
   if (saved) {
-    try { RP.graph = JSON.parse(saved); } catch(e) { RP.graph = null; }
+    try {
+      const parsed = JSON.parse(saved);
+      if (rpValidateGraph(parsed)) RP.graph = parsed;
+    } catch(e) { RP.graph = null; }
   }
   if (!RP.graph) RP.graph = JSON.parse(JSON.stringify(DATA.mapGraph));
   rpBuildAdj();
@@ -2194,7 +2217,7 @@ function rpShowTooltip(nid, cx, cy) {
   let html = '<div class="tt-name">' + esc(n.name || nid) + '</div>';
   html += '<div class="tt-info">';
   if (n.type) html += 'Type: ' + esc(n.type) + '<br>';
-  if (n.chapters && n.chapters.length) html += 'Chapters: ' + n.chapters.join(', ') + '<br>';
+  if (n.chapters && n.chapters.length) html += 'Chapters: ' + n.chapters.map(esc).join(', ') + '<br>';
   if (n.enemies && n.enemies.length) html += 'Enemies: ' + n.enemies.slice(0, 5).map(esc).join(', ') + (n.enemies.length > 5 ? '...' : '') + '<br>';
   if (n.resources && n.resources.length) html += 'Resources: ' + n.resources.map(esc).join(', ') + '<br>';
   html += '</div>';
@@ -2267,14 +2290,14 @@ function rpPopulateStartLocations() {
   const sel = document.getElementById('rp-start-select');
   let html = '<optgroup label="Towns">';
   for (const [nid, n] of Object.entries(RP.graph.nodes)) {
-    if (n.type === 'town') html += '<option value="' + nid + '">' + esc(n.name) + '</option>';
+    if (n.type === 'town') html += '<option value="' + esc(nid) + '">' + esc(n.name) + '</option>';
   }
   html += '</optgroup><optgroup label="Numbered Nodes">';
   const numNodes = Object.entries(RP.graph.nodes)
     .filter(([nid, n]) => !n.type)
     .sort((a, b) => parseInt(a[0]) - parseInt(b[0]));
   numNodes.forEach(([nid, n]) => {
-    html += '<option value="' + nid + '">Node ' + nid + '</option>';
+    html += '<option value="' + esc(nid) + '">Node ' + esc(nid) + '</option>';
   });
   html += '</optgroup>';
   sel.innerHTML = html;
@@ -2313,10 +2336,10 @@ function rpCalculateRoute() {
     html += '<div class="rp-step-info">';
     html += '<div class="rp-step-node" onclick="rpZoomToNode(\'' + esc(s.nodeId) + '\')" style="cursor:pointer;">' + esc(n ? n.name || s.nodeId : s.nodeId) + '</div>';
     html += '<div class="rp-step-mats">Collect: ';
-    html += s.materials.map(mat => '<span class="rp-mat-link" onclick="event.stopPropagation();rpToggleMatDetail(\'' + stepId + '\',\'' + esc(mat).replace(/'/g,"\\'") + '\',\'' + esc(s.nodeId).replace(/'/g,"\\'") + '\')">' + esc(mat) + '</span>').join(', ');
+    html += s.materials.map(mat => '<span class="rp-mat-link" onclick="event.stopPropagation();rpToggleMatDetail(\'' + stepId + '\',\'' + escJs(mat) + '\',\'' + escJs(s.nodeId) + '\')">' + esc(mat) + '</span>').join(', ');
     html += '</div>';
     html += '<div class="rp-step-dist">' + s.distFromPrev + ' step' + (s.distFromPrev !== 1 ? 's' : '') + ' from previous</div>';
-    html += '<div id="' + stepId + '-detail"></div>';
+    html += '<div id="' + esc(stepId) + '-detail"></div>';
     html += '</div></div>';
   });
   resultsDiv.innerHTML = html;
@@ -2480,6 +2503,9 @@ function rpAddNodePrompt(mx, my) {
   if (!nodeId || !nodeId.trim()) return;
   let nid = nodeId.trim();
 
+  // Validate: only allow safe characters (letters, numbers, underscores, hyphens, spaces)
+  if (!/^[a-zA-Z0-9_ \-]+$/.test(nid)) { alert('Node ID must contain only letters, numbers, spaces, hyphens, and underscores.'); return; }
+
   // Normalize input: try to match against known IDs flexibly
   const nidLower = nid.toLowerCase().replace(/[\s\-]+/g, '_');
   // Check if input matches a known town by id or name
@@ -2547,7 +2573,9 @@ function rpExportGraph() {
   }).catch(() => {
     // Fallback: open in a new window
     const w = window.open('', '_blank');
-    w.document.write('<pre>' + json.replace(/</g, '&lt;') + '</pre>');
+    const pre = w.document.createElement('pre');
+    pre.textContent = json;
+    w.document.body.appendChild(pre);
   });
 }
 
