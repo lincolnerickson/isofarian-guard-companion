@@ -302,9 +302,10 @@ def parse_market(wb):
     ws = wb['Market Guide']
     items = []
 
-    towns = ['Mir', 'Razdor', 'Ryba', 'Silny', 'Strofa', 'Vouno', 'Fort Istra Apothecary']
+    towns = ['Mir', 'Razdor', 'Ryba', 'Silny', 'Strofa', 'Vouno']
     # Each town has 3 cols: Buy, Buy 2Rep, Sell
     # Starting at col D (index 3)
+    # Fort Istra Apothecary has only 1 col: Sell (Lux) at col V (index 21)
 
     for row in ws.iter_rows(min_row=6, max_row=ws.max_row, values_only=True):
         vals = [cell_str(c) for c in row]
@@ -322,6 +323,11 @@ def parse_market(wb):
             if buy or buy2r or sell:
                 prices[town] = {'buy': buy, 'buy2Rep': buy2r, 'sell': sell}
             col += 3
+
+        # Fort Istra Apothecary: single sell column (Lux)
+        ft_sell = vals[col] if col < len(vals) else ''
+        if ft_sell:
+            prices['Fort Istra Apothecary'] = {'buy': '', 'buy2Rep': '', 'sell': ft_sell}
 
         entry = {
             'name': name,
@@ -968,18 +974,22 @@ a:hover { text-decoration: underline; color: #90caf9; }
 .empty-msg { text-align: center; color: var(--text2); padding: 40px; font-size: 1rem; }
 
 /* Market table */
-.market-table { width: 100%; border-collapse: collapse; font-size: 0.82rem; overflow-x: auto; display: block; }
-.market-table th, .market-table td { padding: 6px 8px; border: 1px solid #333; white-space: nowrap; }
+.market-wrap { width: 100%; overflow-x: auto; }
+.market-table { width: 100%; border-collapse: collapse; font-size: clamp(0.65rem, 1vw, 0.85rem); table-layout: auto; }
+.market-table th, .market-table td { padding: clamp(4px, 0.5vw, 8px) clamp(4px, 0.6vw, 12px); border: 1px solid #333; white-space: nowrap; text-align: center; }
 .market-table th { background: var(--bg3); color: var(--text2); }
+.market-table td:first-child, .market-table td:nth-child(2) { text-align: left; }
+.market-table th:first-child, .market-table th:nth-child(2) { text-align: left; }
 .market-table .town-header { background: var(--bg3); color: var(--gold); text-align: center; }
 .market-table .buy { color: var(--red); }
 .market-table .sell { color: var(--green); }
-.market-rep-row td { text-align: center; background: var(--bg2); padding: 4px 6px; }
+.market-table tbody tr:hover { background: rgba(255,255,255,0.03); }
+.market-rep-row td { text-align: center; background: var(--bg2); padding: clamp(3px, 0.4vw, 6px) clamp(4px, 0.5vw, 8px); }
 .rep-toggle { display: inline-flex; border-radius: 4px; overflow: hidden; border: 1px solid #444; font-size: 0.75rem; }
 .rep-toggle button { background: var(--bg); color: var(--text2); border: none; padding: 3px 8px; cursor: pointer; transition: all 0.15s; }
 .rep-toggle button.active { background: var(--accent); color: #fff; font-weight: 600; }
 .rep-toggle button:hover:not(.active) { background: rgba(255,255,255,0.1); }
-.market-table td.price-active { font-weight: 600; }
+.market-table td.price-active { font-weight: 600; background: rgba(255,255,255,0.04); }
 .market-table td.price-dim { opacity: 0.35; }
 
 /* Route Planner */
@@ -1085,6 +1095,11 @@ a:hover { text-decoration: underline; color: #90caf9; }
 .rp-item-list-empty { color: var(--text2); font-size: 0.82rem; font-style: italic; margin-top: 6px; }
 
 /* Responsive */
+@media (max-width: 1200px) {
+  .market-table th, .market-table td { padding: 4px 5px; }
+  .market-table .town-header { font-size: 0.75rem; }
+  .rep-toggle button { padding: 2px 6px; font-size: 0.7rem; }
+}
 @media (max-width: 600px) {
   .card-grid { grid-template-columns: 1fr; }
   .header { padding: 12px; }
@@ -1095,6 +1110,8 @@ a:hover { text-decoration: underline; color: #90caf9; }
   .rp-container { flex-direction: column; height: auto; }
   .rp-sidebar { width: 100%; border-right: none; border-bottom: 1px solid #333; }
   .rp-map-area { height: 60vh; }
+  .market-table th, .market-table td { padding: 3px 4px; font-size: 0.65rem; }
+  .rep-toggle button { padding: 2px 4px; font-size: 0.6rem; }
 }
 </style>
 </head>
@@ -1805,23 +1822,38 @@ function renderMarket() {
   const towns = ['Mir', 'Razdor', 'Ryba', 'Silny', 'Strofa', 'Vouno', 'Fort Istra Apothecary'];
   const rep = getMarketRep();
 
-  let html = '<table class="market-table"><thead>';
+  let html = '<div class="market-wrap"><table class="market-table"><thead>';
   html += '<tr><th rowspan="2">Item</th><th rowspan="2">Effect</th>';
   towns.forEach(t => html += '<th class="town-header" colspan="3">' + esc(t) + '</th>');
   html += '</tr><tr>';
-  towns.forEach(() => html += '<th class="buy">Buy</th><th class="buy">2Rep</th><th class="sell">Sell</th>');
+  towns.forEach(t => {
+    if (t === 'Fort Istra Apothecary') {
+      html += '<th colspan="2" style="text-align:center;color:var(--text2);">-</th><th class="sell" style="color:var(--gold);">Sell (' + LUX_ICON + ')</th>';
+    } else {
+      let r = rep[t] || 0;
+      let buyHl = r < 2 ? ' style="background:rgba(255,255,255,0.06);"' : '';
+      let repHl = r >= 2 ? ' style="background:rgba(255,255,255,0.06);"' : '';
+      html += '<th class="buy"' + buyHl + '>Buy</th><th class="buy"' + repHl + '>2Rep</th><th class="sell">Sell</th>';
+    }
+  });
   html += '</tr></thead><tbody>';
 
   // Reputation toggle row
   html += '<tr class="market-rep-row"><td colspan="2" style="text-align:right;color:var(--text2);font-size:0.8rem;font-weight:600;">Reputation</td>';
   towns.forEach(t => {
-    let r = rep[t] || 0;
-    html += '<td colspan="3"><div class="rep-toggle">';
-    html += '<button class="' + (r === 0 ? 'active' : '') + '" onclick="setTownRep(\'' + escJs(t) + '\',0);renderMarket();refreshCurrentTab();">Base</button>';
-    html += '<button class="' + (r >= 2 ? 'active' : '') + '" onclick="setTownRep(\'' + escJs(t) + '\',2);renderMarket();refreshCurrentTab();">2 Rep</button>';
-    html += '</div></td>';
+    if (t === 'Fort Istra Apothecary') {
+      html += '<td colspan="3"></td>';
+    } else {
+      let r = rep[t] || 0;
+      html += '<td colspan="3"><div class="rep-toggle">';
+      html += '<button class="' + (r === 0 ? 'active' : '') + '" onclick="setTownRep(\'' + escJs(t) + '\',0);renderMarket();refreshCurrentTab();">Base</button>';
+      html += '<button class="' + (r >= 2 ? 'active' : '') + '" onclick="setTownRep(\'' + escJs(t) + '\',2);renderMarket();refreshCurrentTab();">2 Rep</button>';
+      html += '</div></td>';
+    }
   });
   html += '</tr>';
+
+  const isLuxTown = (t) => t === 'Fort Istra Apothecary';
 
   DATA.market.forEach(item => {
     html += '<tr><td><a onclick="showDetail(\'material\',\'' + escJs(item.name) + '\')" style="font-weight:600;">' + esc(item.name) + '</a></td>';
@@ -1831,12 +1863,17 @@ function renderMarket() {
       let r = rep[t] || 0;
       let buyClass = r >= 2 ? 'price-dim' : 'price-active';
       let buy2Class = r >= 2 ? 'price-active' : 'price-dim';
-      html += '<td class="' + buyClass + '">' + esc(p.buy || '-') + '</td><td class="' + buy2Class + '">' + esc(p.buy2Rep || '-') + '</td><td>' + esc(p.sell || '-') + '</td>';
+      if (isLuxTown(t)) {
+        let sellVal = p.sell && p.sell !== '-' ? LUX_ICON + esc(p.sell) : '-';
+        html += '<td colspan="2" style="text-align:center;color:var(--text2);">-</td><td style="color:var(--gold);">' + sellVal + '</td>';
+      } else {
+        html += '<td class="' + buyClass + '">' + esc(p.buy || '-') + '</td><td class="' + buy2Class + '">' + esc(p.buy2Rep || '-') + '</td><td>' + esc(p.sell || '-') + '</td>';
+      }
     });
     html += '</tr>';
   });
 
-  html += '</tbody></table>';
+  html += '</tbody></table></div>';
   container.innerHTML = html;
 }
 
@@ -2188,6 +2225,8 @@ function switchTab(tab) {
   currentTab = tab;
   document.querySelectorAll('.tab').forEach(t => t.classList.toggle('active', t.dataset.tab === tab));
   document.querySelectorAll('.panel').forEach(p => p.classList.toggle('active', p.id === 'panel-' + tab));
+  const content = document.querySelector('.content');
+  content.style.maxWidth = (tab === 'market' || tab === 'route-planner') ? 'none' : '';
   refreshCurrentTab();
   if (tab === 'resources') renderResources();
   if (tab === 'route-planner' && typeof rpInit === 'function') rpInit();
