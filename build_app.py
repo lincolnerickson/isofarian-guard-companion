@@ -739,6 +739,44 @@ a:hover { text-decoration: underline; color: #90caf9; }
 .rp-legend { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 8px; font-size: 0.78rem; color: var(--text2); }
 .rp-legend-dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; margin-right: 4px; vertical-align: middle; }
 
+/* Resource Tracker */
+.res-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 10px; margin-bottom: 16px; }
+.res-card { background: var(--bg2); border: 1px solid #333; border-radius: 8px; padding: 12px; }
+.res-name { font-weight: 600; color: var(--text); font-size: 0.9rem; margin-bottom: 8px; }
+.res-controls { display: flex; align-items: center; gap: 6px; }
+.res-qty-btn { width: 30px; height: 30px; border-radius: 4px; border: 1px solid #444; background: var(--bg); color: var(--text); font-size: 1.1rem; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+.res-qty-btn:hover { border-color: var(--accent); background: rgba(233,69,96,0.15); }
+.res-qty-input { width: 60px; text-align: center; padding: 4px; border-radius: 4px; border: 1px solid #444; background: var(--bg); color: var(--text); font-size: 0.95rem; }
+.res-qty-input:focus { outline: none; border-color: var(--accent); }
+.res-section-title { color: var(--gold); font-size: 1rem; font-weight: 700; margin: 16px 0 10px; padding-bottom: 6px; border-bottom: 1px solid #333; }
+.res-section-title:first-child { margin-top: 0; }
+.craft-badge { background: rgba(102,187,106,0.2); color: var(--green); font-size: 0.72rem; padding: 2px 8px; border-radius: 10px; font-weight: 600; border: 1px solid rgba(102,187,106,0.4); }
+.tag.mat-have { background: rgba(102,187,106,0.18); color: var(--green); border: 1px solid rgba(102,187,106,0.3); }
+.tag.mat-have:hover { background: rgba(102,187,106,0.28); border-color: var(--green); }
+.tag.mat-need { background: rgba(239,83,80,0.18); color: var(--red); border: 1px solid rgba(239,83,80,0.3); }
+.tag.mat-need:hover { background: rgba(239,83,80,0.28); border-color: var(--red); }
+.res-clear-btn { padding: 8px 20px; border-radius: 6px; border: 1px solid #444; background: var(--bg); color: var(--text2); cursor: pointer; font-size: 0.85rem; margin-bottom: 16px; }
+.res-clear-btn:hover { border-color: var(--red); color: var(--red); background: rgba(239,83,80,0.1); }
+.bldg-done-btn { padding: 3px 10px; border-radius: 4px; border: 1px solid #444; background: var(--bg); color: var(--text2); cursor: pointer; font-size: 0.78rem; margin-left: auto; }
+.bldg-done-btn:hover { border-color: var(--green); color: var(--green); }
+.bldg-done-btn.completed { border-color: var(--green); color: var(--green); background: rgba(102,187,106,0.15); }
+.card.bldg-completed { opacity: 0.5; }
+.bldg-toggle { margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
+.hero-picker { margin-bottom: 20px; }
+.hero-picker-label { color: var(--gold); font-size: 1rem; font-weight: 700; margin-bottom: 10px; }
+.hero-grid { display: flex; flex-wrap: wrap; gap: 8px; }
+.hero-btn { padding: 8px 16px; border-radius: 6px; border: 1px solid #444; background: var(--bg); color: var(--text2); cursor: pointer; font-size: 0.9rem; transition: all 0.2s; }
+.hero-btn:hover { border-color: var(--accent); color: var(--text); }
+.hero-btn.selected { border-color: var(--accent); color: var(--text); background: rgba(233,69,96,0.2); font-weight: 600; }
+.card-actions { display: flex; gap: 6px; margin-top: 8px; }
+.card-route-btn { padding: 3px 10px; border-radius: 4px; border: 1px solid #444; background: var(--bg); color: var(--text2); cursor: pointer; font-size: 0.78rem; }
+.card-route-btn:hover { border-color: var(--accent); color: var(--accent); }
+.rp-item-list { margin-top: 8px; }
+.rp-item-chip { display: inline-flex; align-items: center; gap: 4px; background: var(--bg); border: 1px solid #444; border-radius: 4px; padding: 4px 8px; margin: 3px 4px 3px 0; font-size: 0.82rem; color: var(--text); }
+.rp-item-chip .rp-chip-x { cursor: pointer; color: var(--text2); font-weight: 700; font-size: 0.9rem; line-height: 1; }
+.rp-item-chip .rp-chip-x:hover { color: var(--red); }
+.rp-item-list-empty { color: var(--text2); font-size: 0.82rem; font-style: italic; margin-top: 6px; }
+
 /* Responsive */
 @media (max-width: 600px) {
   .card-grid { grid-template-columns: 1fr; }
@@ -770,6 +808,7 @@ a:hover { text-decoration: underline; color: #90caf9; }
   <div class="tab" data-tab="buildings">Ft. Istra Buildings</div>
   <div class="tab" data-tab="stones">Speaking Stones</div>
   <div class="tab" data-tab="materials">Material Finder</div>
+  <div class="tab" data-tab="resources">My Resources</div>
   <div class="tab" data-tab="route-planner">Route Planner</div>
 </div>
 
@@ -837,14 +876,26 @@ a:hover { text-decoration: underline; color: #90caf9; }
     <div id="material-detail" style="margin-top:16px;"></div>
   </div>
 
+  <!-- My Resources -->
+  <div class="panel" id="panel-resources">
+    <div id="resources-content"></div>
+  </div>
+
   <!-- Route Planner -->
   <div class="panel" id="panel-route-planner">
     <div class="rp-container">
       <div class="rp-sidebar">
         <h3>Route Planner</h3>
-        <label for="rp-item-select">Item to Craft</label>
-        <input type="text" id="rp-item-search" placeholder="Search items..." class="rp-search-filter" />
-        <select id="rp-item-select"><option value="">-- Select an item --</option></select>
+        <label>Items to Craft</label>
+        <div style="display:flex;gap:6px;align-items:center;">
+          <input type="text" id="rp-item-search" placeholder="Search items..." style="flex:1;" />
+        </div>
+        <div style="display:flex;gap:6px;margin-top:6px;">
+          <select id="rp-item-select" style="flex:1;"><option value="">-- Select an item --</option></select>
+          <button class="rp-btn rp-btn-secondary rp-btn-sm" onclick="rpAddSelectedItem()" style="margin-top:0;white-space:nowrap;">+ Add</button>
+        </div>
+        <div class="rp-item-list" id="rp-item-list"><div class="rp-item-list-empty">No items added. Select items above or use "Add to Route" on craft cards.</div></div>
+        <button class="rp-btn rp-btn-secondary rp-btn-sm" id="rp-clear-items" onclick="rpClearItems()" style="margin-top:6px;">Clear All Items</button>
         <label for="rp-start-select">Starting Location</label>
         <select id="rp-start-select"></select>
         <label for="rp-chapter-select">Current Chapter</label>
@@ -860,6 +911,7 @@ a:hover { text-decoration: underline; color: #90caf9; }
         <div class="rp-editor-bar">
           <button class="rp-btn rp-btn-secondary rp-btn-sm" id="rp-edit-toggle">Edit Map</button>
           <button class="rp-btn rp-btn-secondary rp-btn-sm" id="rp-edit-connect" style="display:none;">Connect Nodes</button>
+          <button class="rp-btn rp-btn-secondary rp-btn-sm" id="rp-edit-water" style="display:none;">Water Route</button>
           <button class="rp-btn rp-btn-secondary rp-btn-sm" id="rp-edit-save" style="display:none;">Save</button>
           <button class="rp-btn rp-btn-secondary rp-btn-sm" id="rp-edit-reset" style="display:none;">Reset</button>
           <button class="rp-btn rp-btn-secondary rp-btn-sm" id="rp-edit-export" style="display:none;">Export JSON</button>
@@ -869,12 +921,14 @@ a:hover { text-decoration: underline; color: #90caf9; }
           <b>Click</b> empty space &rarr; add node<br>
           <b>Drag</b> a node &rarr; move it<br>
           <b>Connect Nodes</b> &rarr; click nodes to draw edges between them (click same node or empty space to stop)<br>
+          <b>Water Route</b> &rarr; toggle on before connecting to create water edges (require Boat Dock)<br>
           <b>Right-click</b> node &rarr; delete it<br>
           <b>Save</b> stores to browser. <b>Export</b> copies JSON.
         </div>
         <div class="rp-legend">
           <span><span class="rp-legend-dot" style="background:#f0c040;"></span>Town</span>
-          <span><span class="rp-legend-dot" style="background:#64b5f6;"></span>Node</span>
+          <span><span class="rp-legend-dot" style="background:#66bb6a;"></span>Node</span>
+          <span><span class="rp-legend-dot" style="background:#42a5f5;"></span>Water Node</span>
           <span><span class="rp-legend-dot" style="background:#ab47bc;"></span>Special</span>
           <span><span class="rp-legend-dot" style="background:#ef5350;"></span>Route Stop</span>
         </div>
@@ -1104,7 +1158,8 @@ function showDetail(type, identifier) {
     let hasMats = Object.keys(item.materials).length || Object.keys(item.wood).length || Object.keys(item.ores).length;
     if (hasMats) {
       html += '<h3>Crafting Materials</h3>';
-      html += '<table class="recipe-table"><tr><th>Material</th><th>Qty</th><th>Qty (2 Rep)</th><th>Source</th></tr>';
+      let detailRes = getResources();
+      html += '<table class="recipe-table"><tr><th>Material</th><th>Owned</th><th>Qty</th><th>Qty (2 Rep)</th><th>Source</th></tr>';
 
       const renderMats = (group, category) => {
         Object.entries(group).forEach(([mat, info]) => {
@@ -1121,7 +1176,11 @@ function showDetail(type, identifier) {
             if (source) source += ' | ';
             source += '<span style="color:var(--orange)">Nodes: ' + esc(DATA.harvestLocations[mat]) + '</span>';
           }
+          let owned = detailRes[mat] || 0;
+          let needed = parseInt(info.qty || info) || 0;
+          let ownColor = owned >= needed ? 'var(--green)' : 'var(--red)';
           html += '<tr><td><a onclick="showDetail(\'material\',\'' + escJs(mat) + '\')">' + esc(mat) + '</a></td>';
+          html += '<td style="color:' + ownColor + ';font-weight:600;">' + owned + '</td>';
           html += '<td>' + esc(info.qty || info) + '</td><td>' + esc(info.rep2 || info['2R'] || '') + '</td>';
           html += '<td style="font-size:0.8rem;">' + (source || '-') + '</td></tr>';
         });
@@ -1181,7 +1240,12 @@ function showDetail(type, identifier) {
       html += '<div style="color:var(--green);font-size:0.9rem;">Nodes: ' + esc(DATA.harvestLocations[identifier]) + '</div>';
     }
     if (DATA.resourceLuxCosts[identifier]) {
-      html += '<div style="color:var(--gold);font-size:0.85rem;margin-top:4px;">Lux cost to buy x4: ' + esc(DATA.resourceLuxCosts[identifier]) + '</div>';
+      if (canBuyResource(identifier)) {
+        html += '<div style="color:var(--gold);font-size:0.85rem;margin-top:4px;">Lux cost to buy x4: ' + esc(DATA.resourceLuxCosts[identifier]) + '</div>';
+      } else {
+        let reqB = WOOD_MATS.includes(identifier) ? 'Lumbermill (Upgraded)' : 'Lapidary';
+        html += '<div style="color:var(--text2);font-size:0.85rem;margin-top:4px;">Lux cost to buy x4: <span style="text-decoration:line-through;">' + esc(DATA.resourceLuxCosts[identifier]) + '</span> <span style="color:var(--red);">(requires ' + esc(reqB) + ')</span></div>';
+      }
     }
 
     // Used in crafting
@@ -1208,7 +1272,11 @@ function showDetail(type, identifier) {
     html += '</div>';
     html += '<div style="margin:8px 0;padding:8px;background:var(--bg);border-radius:4px;font-size:0.9rem;">' + esc(stone.bonus) + '</div>';
     if (stone.lapidaryExchange) {
-      html += '<div style="font-size:0.85rem;color:var(--text2);">Lapidary Exchange: ' + esc(stone.lapidaryExchange) + '</div>';
+      if (canBuyStones()) {
+        html += '<div style="font-size:0.85rem;color:var(--text2);">Lapidary Exchange: ' + esc(stone.lapidaryExchange) + '</div>';
+      } else {
+        html += '<div style="font-size:0.85rem;color:var(--text2);">Lapidary Exchange: <span style="text-decoration:line-through;">' + esc(stone.lapidaryExchange) + '</span> <span style="color:var(--red);">(requires Lapidary (Upgraded))</span></div>';
+      }
     }
 
     // Used in crafting
@@ -1303,6 +1371,7 @@ function renderArmorWeapons(typeFilter, ratingFilter, search) {
     if (typeFilter !== 'all' && i.type !== typeFilter) return false;
     if (ratingFilter !== 'all' && i.rating !== ratingFilter) return false;
     if (search && !matchesSearchCraft(i, search)) return false;
+    if (!itemMatchesHeroes(i)) return false;
     return true;
   });
 
@@ -1334,7 +1403,7 @@ function renderCraftCard(item, type) {
   let html = '<div class="card">';
   html += '<div class="card-title"><a onclick="showDetail(\'craft\',\'' + escJs(item.name) + '\')">' + esc(item.name) + '</a>';
   if (item.rating) html += ' ' + ratingStars(item.rating);
-  html += '</div>';
+  html += '<!--CRAFT_BADGE--></div>';
 
   let sub = [];
   if (item.type) sub.push(item.type);
@@ -1359,20 +1428,43 @@ function renderCraftCard(item, type) {
     html += '<a class="tag craft" onclick="event.stopPropagation();showDetail(\'craft\',\'' + escJs(item.prerequisite) + '\')">' + esc(item.prerequisite) + '</a>';
   }
 
-  // Show materials compactly
+  // Show materials compactly with owned/needed
   let mats = [];
-  Object.entries(item.materials || {}).forEach(([m, info]) => mats.push(m + ' x' + (info.qty || info)));
-  Object.entries(item.wood || {}).forEach(([m, info]) => mats.push(m + ' x' + (info.qty || info)));
-  Object.entries(item.ores || {}).forEach(([m, info]) => mats.push(m + ' x' + (info.qty || info)));
-  if (item.speakingStone) mats.push(item.speakingStone);
-  if (item.itemRequired) mats.push(item.itemRequired);
+  const myRes = getResources();
+  let allMet = true;
+  Object.entries(item.materials || {}).forEach(([m, info]) => { let need = parseInt(info.qty || info) || 0; mats.push({name:m, need}); });
+  Object.entries(item.wood || {}).forEach(([m, info]) => { let need = parseInt(info.qty || info) || 0; mats.push({name:m, need}); });
+  Object.entries(item.ores || {}).forEach(([m, info]) => { let need = parseInt(info.qty || info) || 0; mats.push({name:m, need}); });
+  if (item.speakingStone) mats.push({name: item.speakingStone, need: 0, raw: true});
+  if (item.itemRequired) mats.push({name: item.itemRequired, need: 0, raw: true});
+
+  mats.forEach(m => { if (!m.raw && m.need > 0 && (myRes[m.name] || 0) < m.need) allMet = false; });
+  let hasCraftMats = mats.some(m => !m.raw && m.need > 0);
 
   if (mats.length) {
     html += '<div class="section-label">Materials</div><div class="tag-list">';
     mats.forEach(m => {
-      let baseName = m.replace(/\s*x\d+.*/i, '').replace(/\s*\(.*/,'').trim();
-      html += '<a class="tag" onclick="event.stopPropagation();showDetail(\'material\',\'' + escJs(baseName) + '\')">' + esc(m) + '</a>';
+      if (m.raw) {
+        html += '<a class="tag" onclick="event.stopPropagation();showDetail(\'material\',\'' + escJs(m.name.replace(/\s*x\d+.*/i,'').trim()) + '\')">' + esc(m.name) + '</a>';
+      } else {
+        let owned = myRes[m.name] || 0;
+        let cls = owned >= m.need ? 'mat-have' : 'mat-need';
+        html += '<a class="tag ' + cls + '" onclick="event.stopPropagation();showDetail(\'material\',\'' + escJs(m.name) + '\')">' + esc(m.name) + ' ' + owned + '/' + m.need + '</a>';
+      }
     });
+    html += '</div>';
+  }
+
+  if (hasCraftMats && allMet) {
+    html = html.replace('<!--CRAFT_BADGE-->', '<span class="craft-badge">Can Craft</span>');
+  } else {
+    html = html.replace('<!--CRAFT_BADGE-->', '');
+  }
+
+  if (hasCraftMats) {
+    html += '<div class="card-actions">';
+    html += '<button class="card-route-btn" onclick="event.stopPropagation();addToRouteAndGo(\'' + escJs(item.name) + '\')">Plan Route</button>';
+    html += '<button class="card-route-btn" onclick="event.stopPropagation();addToRoutePlanner(\'' + escJs(item.name) + '\')">+ Add to Route</button>';
     html += '</div>';
   }
 
@@ -1407,38 +1499,82 @@ function renderMarket() {
 
 function renderBuildings() {
   const container = document.getElementById('buildings-content');
-  let html = '<div class="card-grid">';
+  const done = getCompletedBuildings();
+  const doneCount = DATA.buildings.filter(b => done.includes(b.name)).length;
 
+  let html = '<div class="bldg-toggle">';
+  html += '<label style="color:var(--text2);font-size:0.85rem;cursor:pointer;display:flex;align-items:center;gap:6px;">';
+  html += '<input type="checkbox" ' + (showCompletedBuildings ? 'checked' : '') + ' onchange="showCompletedBuildings=this.checked;renderBuildings();" /> Show completed (' + doneCount + '/' + DATA.buildings.length + ')';
+  html += '</label></div>';
+
+  html += '<div class="card-grid">';
+
+  const bldgRes = getResources();
   DATA.buildings.forEach(b => {
-    html += '<div class="card">';
-    html += '<div class="card-title">' + esc(b.name) + '</div>';
-    if (b.itemRequired) {
-      html += '<div class="card-subtitle">Requires: ' + esc(b.itemRequired) + '</div>';
-    }
+    let isDone = done.includes(b.name);
+    if (isDone && !showCompletedBuildings) return;
+
+    let card = '<div class="card' + (isDone ? ' bldg-completed' : '') + '">';
+    card += '<div class="card-title" style="flex-wrap:wrap;">' + esc(b.name);
 
     let mats = [];
-    Object.entries(b.wood).forEach(([m, qty]) => mats.push({ name: m, qty, type: 'Wood' }));
-    Object.entries(b.ores).forEach(([m, qty]) => mats.push({ name: m, qty, type: 'Ore' }));
+    Object.entries(b.wood).forEach(([m, qty]) => mats.push({ name: m, need: parseInt(qty) || 0 }));
+    Object.entries(b.ores).forEach(([m, qty]) => mats.push({ name: m, need: parseInt(qty) || 0 }));
+
+    let allMet = mats.length > 0;
+    mats.forEach(m => { if ((bldgRes[m.name] || 0) < m.need) allMet = false; });
+
+    if (allMet && mats.length && !isDone) {
+      card += ' <span class="craft-badge">Can Craft</span>';
+    }
+
+    card += '<button class="bldg-done-btn' + (isDone ? ' completed' : '') + '" onclick="toggleBuildingDone(\'' + escJs(b.name) + '\')">' + (isDone ? 'Completed' : 'Mark Done') + '</button>';
+
+    if (b.itemRequired) {
+      card += '</div><div class="card-subtitle">Requires: ' + esc(b.itemRequired) + '</div>';
+    } else {
+      card += '</div>';
+    }
 
     if (mats.length) {
-      html += '<div class="section-label">Resources Needed</div><div class="tag-list">';
+      card += '<div class="section-label">Resources Needed</div><div class="tag-list">';
       mats.forEach(m => {
-        html += '<a class="tag" onclick="showDetail(\'material\',\'' + escJs(m.name) + '\')">' + esc(m.name) + ' x' + esc(m.qty) + '</a>';
+        let owned = bldgRes[m.name] || 0;
+        let cls = owned >= m.need ? 'mat-have' : 'mat-need';
+        card += '<a class="tag ' + cls + '" onclick="showDetail(\'material\',\'' + escJs(m.name) + '\')">' + esc(m.name) + ' ' + owned + '/' + m.need + '</a>';
       });
-      html += '</div>';
+      card += '</div>';
     }
-    html += '</div>';
+
+    if (mats.length) {
+      card += '<div class="card-actions">';
+      card += '<button class="card-route-btn" onclick="event.stopPropagation();addToRouteAndGo(\'' + escJs(b.name) + '\')">Plan Route</button>';
+      card += '<button class="card-route-btn" onclick="event.stopPropagation();addToRoutePlanner(\'' + escJs(b.name) + '\')">+ Add to Route</button>';
+      card += '</div>';
+    }
+
+    card += '</div>';
+    html += card;
   });
 
   html += '</div>';
 
   // Harvesting locations
   html += '<h3 style="color:var(--gold);margin-top:20px;margin-bottom:10px;">Harvesting & Mining Locations</h3>';
-  html += '<table class="recipe-table"><tr><th>Resource</th><th>Nodes</th><th>Lux Cost (x4)</th></tr>';
+  html += '<table class="recipe-table"><tr><th>Resource</th><th>Nodes</th><th>Lux Cost (x4)</th><th>Requires</th></tr>';
   Object.entries(DATA.harvestLocations).forEach(([mat, locs]) => {
+    const unlocked = canBuyResource(mat);
+    const reqBuilding = WOOD_MATS.includes(mat) ? 'Lumbermill (Upgraded)' : 'Lapidary';
     html += '<tr><td><a onclick="showDetail(\'material\',\'' + escJs(mat) + '\')">' + esc(mat) + '</a></td>';
     html += '<td style="color:var(--green)">' + esc(locs) + '</td>';
-    html += '<td style="color:var(--gold)">' + esc(DATA.resourceLuxCosts[mat] || '-') + '</td></tr>';
+    if (unlocked) {
+      html += '<td style="color:var(--gold)">' + esc(DATA.resourceLuxCosts[mat] || '-') + '</td>';
+      html += '<td style="color:var(--green);font-size:0.8rem;">Unlocked</td>';
+    } else {
+      html += '<td style="color:var(--text2);text-decoration:line-through;">' + esc(DATA.resourceLuxCosts[mat] || '-') + '</td>';
+      html += '<td style="color:var(--red);font-size:0.8rem;">' + esc(reqBuilding) + '</td>';
+    }
+    html += '</tr>';
   });
   html += '</table>';
 
@@ -1457,7 +1593,11 @@ function renderStones() {
     html += '<div class="card-subtitle">' + esc(s.element) + ' | ' + esc(s.color) + ' | x' + esc(s.available) + '</div>';
     html += '<div style="padding:6px;background:var(--bg);border-radius:4px;font-size:0.9rem;">' + esc(s.bonus) + '</div>';
     if (s.lapidaryExchange) {
-      html += '<div style="font-size:0.82rem;color:var(--text2);margin-top:4px;">Exchange: ' + esc(s.lapidaryExchange) + '</div>';
+      if (canBuyStones()) {
+        html += '<div style="font-size:0.82rem;color:var(--text2);margin-top:4px;">Exchange: ' + esc(s.lapidaryExchange) + '</div>';
+      } else {
+        html += '<div style="font-size:0.82rem;color:var(--text2);margin-top:4px;">Exchange: <span style="text-decoration:line-through;">' + esc(s.lapidaryExchange) + '</span> <span style="color:var(--red);font-size:0.78rem;">(Lapidary Upgraded)</span></div>';
+      }
     }
 
     // What uses this stone
@@ -1481,6 +1621,158 @@ function renderMaterialIndex() {
     '<a class="tag" onclick="showDetail(\'material\',\'' + escJs(m) + '\')" style="font-size:0.9rem;padding:6px 12px;">' + esc(m) + '</a>'
   ).join('');
 }
+
+// --- Resource Tracker ---
+const RES_GROUPS = {
+  'Monster Materials': ['Metal Fragments','Bone Fragments','Feathers','Wolf Pelt','Rough Leather','Animal Hide','Claw','Bear Pelt','Horn','Spines','Scales','Carapace','Tenebris Shards','Tenebris Skull','Tenebris Essence'],
+  'Woods': ['Pine','Rosewood','Ash','Autumn Blaze','Dogwood','Cedar','Cherry','Ancient Oak'],
+  'Ores': ['Iron','Silver','Gold','Agate','Crystal','Diamond']
+};
+
+const ALL_HEROES = ['Alek','Catherine','Grigory','Kharzin','Pavel','Vera','Yana','Yury'];
+
+function getSelectedHeroes() {
+  try {
+    let raw = localStorage.getItem('tig_heroes');
+    if (!raw) return [];
+    let arr = JSON.parse(raw);
+    return Array.isArray(arr) ? arr.filter(h => ALL_HEROES.includes(h)) : [];
+  } catch(e) { return []; }
+}
+
+function saveSelectedHeroes(arr) {
+  localStorage.setItem('tig_heroes', JSON.stringify(arr));
+}
+
+function toggleHero(name) {
+  let heroes = getSelectedHeroes();
+  let idx = heroes.indexOf(name);
+  if (idx >= 0) heroes.splice(idx, 1);
+  else heroes.push(name);
+  saveSelectedHeroes(heroes);
+  renderResources();
+}
+
+function itemMatchesHeroes(item) {
+  if (!item.limitedTo) return true;
+  let heroes = getSelectedHeroes();
+  if (!heroes.length) return true;
+  let itemHeroes = item.limitedTo.split(',').map(s => s.trim());
+  return itemHeroes.some(h => heroes.includes(h));
+}
+
+const WOOD_MATS = RES_GROUPS['Woods'];
+const ORE_MATS = RES_GROUPS['Ores'];
+
+function canBuyResource(mat) {
+  const done = getCompletedBuildings();
+  if (WOOD_MATS.includes(mat)) return done.includes('Lumbermill (Upgraded)');
+  if (ORE_MATS.includes(mat)) return done.includes('Lapidary');
+  return false;
+}
+
+function canBuyStones() {
+  return getCompletedBuildings().includes('Lapidary (Upgraded)');
+}
+
+function getResources() {
+  try {
+    let raw = localStorage.getItem('tig_resources');
+    if (!raw) return {};
+    let obj = JSON.parse(raw);
+    if (typeof obj !== 'object' || obj === null || Array.isArray(obj)) return {};
+    let clean = {};
+    for (let k in obj) { clean[k] = Math.max(0, parseInt(obj[k]) || 0); }
+    return clean;
+  } catch(e) { return {}; }
+}
+
+function saveResources(res) {
+  localStorage.setItem('tig_resources', JSON.stringify(res));
+}
+
+function renderResources() {
+  const container = document.getElementById('resources-content');
+  const res = getResources();
+  const heroes = getSelectedHeroes();
+
+  let html = '<div class="hero-picker"><div class="hero-picker-label">My Heroes</div>';
+  html += '<div class="hero-grid">';
+  ALL_HEROES.forEach(h => {
+    html += '<button class="hero-btn' + (heroes.includes(h) ? ' selected' : '') + '" onclick="toggleHero(\'' + escJs(h) + '\')">' + esc(h) + '</button>';
+  });
+  html += '</div>';
+  if (!heroes.length) html += '<div style="color:var(--text2);font-size:0.82rem;margin-top:6px;">No heroes selected — all items shown on Armor &amp; Weapons tab.</div>';
+  else html += '<div style="color:var(--text2);font-size:0.82rem;margin-top:6px;">Armor &amp; Weapons tab will hide items limited to other heroes.</div>';
+  html += '</div>';
+
+  html += '<button class="res-clear-btn" onclick="clearAllResources()">Clear All</button>';
+
+  Object.entries(RES_GROUPS).forEach(([group, mats]) => {
+    html += '<div class="res-section-title">' + esc(group) + '</div>';
+    html += '<div class="res-grid">';
+    mats.forEach(mat => {
+      let qty = res[mat] || 0;
+      html += '<div class="res-card">';
+      html += '<div class="res-name">' + esc(mat) + '</div>';
+      html += '<div class="res-controls">';
+      html += '<button class="res-qty-btn" onclick="adjustResource(\'' + escJs(mat) + '\',-1)">&#8722;</button>';
+      html += '<input type="number" class="res-qty-input" min="0" value="' + qty + '" data-mat="' + escJs(mat) + '" onchange="setResource(this)" />';
+      html += '<button class="res-qty-btn" onclick="adjustResource(\'' + escJs(mat) + '\',1)">+</button>';
+      html += '</div></div>';
+    });
+    html += '</div>';
+  });
+
+  container.innerHTML = html;
+}
+
+function adjustResource(mat, delta) {
+  let res = getResources();
+  res[mat] = Math.max(0, (res[mat] || 0) + delta);
+  saveResources(res);
+  renderResources();
+}
+
+function setResource(input) {
+  let res = getResources();
+  res[input.dataset.mat] = Math.max(0, parseInt(input.value) || 0);
+  saveResources(res);
+}
+
+function clearAllResources() {
+  saveResources({});
+  renderResources();
+  refreshCurrentTab();
+}
+
+function getCompletedBuildings() {
+  try {
+    let raw = localStorage.getItem('tig_buildings_done');
+    if (!raw) return [];
+    let arr = JSON.parse(raw);
+    return Array.isArray(arr) ? arr : [];
+  } catch(e) { return []; }
+}
+
+function saveCompletedBuildings(arr) {
+  localStorage.setItem('tig_buildings_done', JSON.stringify(arr));
+}
+
+function toggleBuildingDone(name) {
+  let done = getCompletedBuildings();
+  let idx = done.indexOf(name);
+  if (idx >= 0) done.splice(idx, 1);
+  else done.push(name);
+  saveCompletedBuildings(done);
+  renderBuildings();
+  // Rebuild route planner adjacency if boat dock status changed
+  if (name.toLowerCase().includes('boat dock') && RP.graph) {
+    rpBuildAdj();
+  }
+}
+
+let showCompletedBuildings = false;
 
 // --- Search ---
 function matchesSearch(enemy, q) {
@@ -1518,6 +1810,7 @@ function switchTab(tab) {
   document.querySelectorAll('.tab').forEach(t => t.classList.toggle('active', t.dataset.tab === tab));
   document.querySelectorAll('.panel').forEach(p => p.classList.toggle('active', p.id === 'panel-' + tab));
   refreshCurrentTab();
+  if (tab === 'resources') renderResources();
   if (tab === 'route-planner' && typeof rpInit === 'function') rpInit();
 }
 
@@ -1525,6 +1818,9 @@ function refreshCurrentTab() {
   if (currentTab === 'enemies') renderEnemies(enemyFilter, searchQuery);
   else if (currentTab === 'armor-weapons') renderArmorWeapons(awTypeFilter, awRatingFilter, searchQuery);
   else if (currentTab === 'accessories') renderAccessories(accTypeFilter, searchQuery);
+  else if (currentTab === 'buildings') renderBuildings();
+  else if (currentTab === 'stones') renderStones();
+  else if (currentTab === 'resources') renderResources();
 }
 
 document.getElementById('tabs').addEventListener('click', e => {
@@ -1597,7 +1893,7 @@ const RP = {
   // Route result
   route: null,
   // Editor state
-  editMode: false, connectMode: false,
+  editMode: false, connectMode: false, waterEdgeMode: false,
   dragNode: null, dragOffX: 0, dragOffY: 0,
   edgeStart: null,
   // Mouse state
@@ -1614,7 +1910,7 @@ function rpValidateGraph(g) {
     if (n.name !== undefined && typeof n.name !== 'string') return false;
   }
   for (const e of g.edges) {
-    if (!Array.isArray(e) || e.length !== 2) return false;
+    if (!Array.isArray(e) || e.length < 2 || e.length > 3) return false;
   }
   return true;
 }
@@ -1647,11 +1943,19 @@ function rpInit() {
   rpDraw();
 }
 
+function rpIsBoatDockBuilt() {
+  return getCompletedBuildings().some(b => b.toLowerCase().includes('boat dock'));
+}
+
 function rpBuildAdj() {
   RP.adj = {};
   const nodes = RP.graph.nodes;
+  const boatOk = rpIsBoatDockBuilt();
   for (const nid in nodes) RP.adj[nid] = [];
-  RP.graph.edges.forEach(([a, b]) => {
+  RP.graph.edges.forEach(e => {
+    const [a, b] = e;
+    const isWater = e[2] === 'water';
+    if (isWater && !boatOk) return;
     if (nodes[a] && nodes[b]) {
       if (!RP.adj[a]) RP.adj[a] = [];
       if (!RP.adj[b]) RP.adj[b] = [];
@@ -1884,6 +2188,117 @@ function rpComputeRoute(itemName, startNode, chapter) {
   return { stops, totalDist, fullPath, startNode, materialsNeeded };
 }
 
+function rpComputeRouteMulti(itemNames, startNode, chapter) {
+  // Merge materials from all items
+  const materialMap = {}; // name -> total qty needed
+  let foundAny = false;
+  itemNames.forEach(itemName => {
+    let item = DATA.armorWeapons.find(i => i.name === itemName);
+    if (!item) item = DATA.accessories.find(i => i.name === itemName);
+    if (!item) item = DATA.buildings.find(i => i.name === itemName);
+    if (!item) return;
+    [item.materials, item.wood, item.ores].forEach(group => {
+      Object.entries(group || {}).forEach(([mat, info]) => {
+        foundAny = true;
+        const qty = parseInt(info.qty || info) || 0;
+        materialMap[mat] = (materialMap[mat] || 0) + qty;
+      });
+    });
+  });
+  if (!foundAny) return null;
+
+  const materialsNeeded = Object.entries(materialMap).map(([name, qty]) => ({ name, qty }));
+
+  // For each material, find source nodes accessible in this chapter
+  const matSources = {};
+  materialsNeeded.forEach(m => {
+    matSources[m.name] = rpGetMaterialSources(m.name, chapter);
+  });
+
+  // Check if all materials have at least one source
+  const unreachable = materialsNeeded.filter(m => !matSources[m.name].length);
+  if (unreachable.length) {
+    return { error: 'No accessible sources for: ' + unreachable.map(m => m.name).join(', ') };
+  }
+
+  // Greedy nearest-unvisited-source heuristic
+  let current = startNode;
+  const collected = new Set();
+  const stops = [];
+
+  while (collected.size < materialsNeeded.length) {
+    let bestNode = null, bestDist = Infinity, bestMats = [];
+    materialsNeeded.forEach(m => {
+      if (collected.has(m.name)) return;
+      matSources[m.name].forEach(nid => {
+        const d = rpGetDist(current, nid);
+        if (d < bestDist) {
+          bestDist = d;
+          bestNode = nid;
+          bestMats = [m.name];
+        } else if (d === bestDist && nid === bestNode) {
+          bestMats.push(m.name);
+        }
+      });
+    });
+    if (!bestNode || bestDist === Infinity) {
+      return { error: 'Cannot reach all material sources from ' + current };
+    }
+    const allMatsHere = [];
+    materialsNeeded.forEach(m => {
+      if (!collected.has(m.name) && matSources[m.name].includes(bestNode)) {
+        allMatsHere.push(m.name);
+      }
+    });
+    allMatsHere.forEach(mn => collected.add(mn));
+    stops.push({ nodeId: bestNode, materials: allMatsHere, distFromPrev: bestDist });
+    current = bestNode;
+  }
+
+  // 2-opt improvement
+  for (let improved = true; improved;) {
+    improved = false;
+    for (let i = 0; i < stops.length - 1; i++) {
+      for (let j = i + 1; j < stops.length; j++) {
+        const before = i === 0 ? startNode : stops[i - 1].nodeId;
+        let oldCost = rpGetDist(before, stops[i].nodeId);
+        for (let k = i; k < j; k++) oldCost += rpGetDist(stops[k].nodeId, stops[k + 1].nodeId);
+        const rev = stops.slice(i, j + 1).reverse();
+        let newCost = rpGetDist(before, rev[0].nodeId);
+        for (let k = 0; k < rev.length - 1; k++) newCost += rpGetDist(rev[k].nodeId, rev[k + 1].nodeId);
+        if (j + 1 < stops.length) {
+          oldCost += rpGetDist(stops[j].nodeId, stops[j + 1].nodeId);
+          newCost += rpGetDist(rev[rev.length - 1].nodeId, stops[j + 1].nodeId);
+        }
+        if (newCost < oldCost) {
+          for (let k = 0; k < rev.length; k++) stops[i + k] = rev[k];
+          improved = true;
+        }
+      }
+    }
+  }
+
+  // Recalculate distances after optimization
+  let prev = startNode;
+  let totalDist = 0;
+  stops.forEach(s => {
+    s.distFromPrev = rpGetDist(prev, s.nodeId);
+    totalDist += s.distFromPrev;
+    prev = s.nodeId;
+  });
+
+  // Build full path for drawing
+  const fullPath = [];
+  prev = startNode;
+  stops.forEach(s => {
+    const seg = rpBFSPath(prev, s.nodeId);
+    if (seg) { if (fullPath.length) seg.shift(); fullPath.push(...seg); }
+    prev = s.nodeId;
+  });
+
+  return { stops, totalDist, fullPath, startNode, materialsNeeded };
+}
+
 // --- Canvas Rendering ---
 function rpResize() {
   const area = document.getElementById('rp-map-area');
@@ -1934,14 +2349,32 @@ function rpDraw() {
   const r = Math.max(8, 12 / Math.sqrt(RP.zoom));
 
   // Draw edges
+  const boatOk = rpIsBoatDockBuilt();
+  // Land edges first
   ctx.strokeStyle = 'rgba(255,255,255,0.6)';
   ctx.lineWidth = 4 / RP.zoom;
-  RP.graph.edges.forEach(([a, b]) => {
-    if (!nodes[a] || !nodes[b]) return;
+  RP.graph.edges.forEach(e => {
+    if (e[2] === 'water') return;
+    if (!nodes[e[0]] || !nodes[e[1]]) return;
     ctx.beginPath();
-    ctx.moveTo(nodes[a].x, nodes[a].y);
-    ctx.lineTo(nodes[b].x, nodes[b].y);
+    ctx.moveTo(nodes[e[0]].x, nodes[e[0]].y);
+    ctx.lineTo(nodes[e[1]].x, nodes[e[1]].y);
     ctx.stroke();
+  });
+  // Water edges
+  RP.graph.edges.forEach(e => {
+    if (e[2] !== 'water') return;
+    if (!nodes[e[0]] || !nodes[e[1]]) return;
+    ctx.save();
+    ctx.strokeStyle = boatOk ? 'rgba(30,90,160,0.9)' : 'rgba(30,90,160,0.35)';
+    ctx.lineWidth = 4 / RP.zoom;
+    ctx.setLineDash([12 / RP.zoom, 8 / RP.zoom]);
+    ctx.beginPath();
+    ctx.moveTo(nodes[e[0]].x, nodes[e[0]].y);
+    ctx.lineTo(nodes[e[1]].x, nodes[e[1]].y);
+    ctx.stroke();
+    ctx.setLineDash([]);
+    ctx.restore();
   });
 
   // Draw connect-mode preview line (dashed line from edgeStart to cursor)
@@ -1949,7 +2382,7 @@ function rpDraw() {
     const sn = nodes[RP.edgeStart];
     const [cmx, cmy] = rpScreenToMap(RP.mouseX, RP.mouseY);
     ctx.save();
-    ctx.strokeStyle = '#66bb6a';
+    ctx.strokeStyle = RP.waterEdgeMode ? '#42a5f5' : '#66bb6a';
     ctx.lineWidth = 3 / RP.zoom;
     ctx.setLineDash([10 / RP.zoom, 8 / RP.zoom]);
     ctx.beginPath();
@@ -1996,9 +2429,15 @@ function rpDraw() {
     }
   }
 
+  // Build set of water nodes (nodes with at least one water edge)
+  const waterNodes = new Set();
+  RP.graph.edges.forEach(e => {
+    if (e[2] === 'water') { waterNodes.add(e[0]); waterNodes.add(e[1]); }
+  });
+
   // Draw nodes
   for (const [nid, n] of Object.entries(nodes)) {
-    let color = '#64b5f6'; // default: numbered node
+    let color = waterNodes.has(nid) ? '#42a5f5' : '#66bb6a'; // water: blue, regular: green
     if (n.type === 'town') color = '#f0c040';
     else if (n.type === 'special') color = '#ab47bc';
     // Highlight route stops
@@ -2200,6 +2639,7 @@ function rpBindEvents() {
   // Editor buttons
   document.getElementById('rp-edit-toggle').addEventListener('click', rpToggleEditor);
   document.getElementById('rp-edit-connect').addEventListener('click', rpToggleConnect);
+  document.getElementById('rp-edit-water').addEventListener('click', rpToggleWaterMode);
   document.getElementById('rp-edit-save').addEventListener('click', rpSaveGraph);
   document.getElementById('rp-edit-reset').addEventListener('click', rpResetGraph);
   document.getElementById('rp-edit-export').addEventListener('click', rpExportGraph);
@@ -2303,25 +2743,73 @@ function rpPopulateStartLocations() {
   sel.innerHTML = html;
 }
 
+// --- Multi-item route list ---
+let rpItemList = [];
+
+function rpRenderItemList() {
+  const el = document.getElementById('rp-item-list');
+  if (!rpItemList.length) {
+    el.innerHTML = '<div class="rp-item-list-empty">No items added. Select items above or use "Add to Route" on craft cards.</div>';
+    return;
+  }
+  el.innerHTML = rpItemList.map((name, i) =>
+    '<span class="rp-item-chip">' + esc(name) + ' <span class="rp-chip-x" onclick="rpRemoveItem(' + i + ')">&times;</span></span>'
+  ).join('');
+}
+
+function rpAddSelectedItem() {
+  const sel = document.getElementById('rp-item-select');
+  if (!sel.value) return;
+  if (!rpItemList.includes(sel.value)) {
+    rpItemList.push(sel.value);
+    rpRenderItemList();
+  }
+  sel.value = '';
+}
+
+function rpRemoveItem(idx) {
+  rpItemList.splice(idx, 1);
+  rpRenderItemList();
+}
+
+function rpClearItems() {
+  rpItemList = [];
+  rpRenderItemList();
+}
+
+function addToRoutePlanner(itemName) {
+  if (!rpItemList.includes(itemName)) {
+    rpItemList.push(itemName);
+  }
+  rpRenderItemList();
+}
+
+function addToRouteAndGo(itemName) {
+  rpItemList = [itemName];
+  switchTab('route-planner');
+  rpRenderItemList();
+}
+
 // --- Route Calculation UI ---
 function rpCalculateRoute() {
-  const itemName = document.getElementById('rp-item-select').value;
   const startNode = document.getElementById('rp-start-select').value;
   const chapter = document.getElementById('rp-chapter-select').value;
   const resultsDiv = document.getElementById('rp-route-results');
   const summaryDiv = document.getElementById('rp-route-summary');
 
-  if (!itemName) { resultsDiv.innerHTML = '<div class="empty-msg">Please select an item to craft.</div>'; return; }
+  if (!rpItemList.length) { resultsDiv.innerHTML = '<div class="empty-msg">Please add at least one item to craft.</div>'; return; }
 
-  const result = rpComputeRoute(itemName, startNode, chapter);
-  if (!result) { resultsDiv.innerHTML = '<div class="empty-msg">No crafting materials found for this item.</div>'; summaryDiv.style.display = 'none'; return; }
+  const result = rpComputeRouteMulti(rpItemList, startNode, chapter);
+  if (!result) { resultsDiv.innerHTML = '<div class="empty-msg">No crafting materials found for these items.</div>'; summaryDiv.style.display = 'none'; return; }
   if (result.error) { resultsDiv.innerHTML = '<div class="empty-msg" style="color:var(--red);">' + esc(result.error) + '</div>'; summaryDiv.style.display = 'none'; return; }
 
   RP.route = result;
 
   // Show summary
   summaryDiv.style.display = 'block';
-  summaryDiv.innerHTML = '<span class="label">Total steps:</span> <span class="value">' + result.totalDist + '</span> | <span class="label">Stops:</span> <span class="value">' + result.stops.length + '</span>';
+  let summaryHtml = '<span class="label">Items:</span> <span class="value">' + rpItemList.map(n => esc(n)).join(', ') + '</span><br>';
+  summaryHtml += '<span class="label">Total steps:</span> <span class="value">' + result.totalDist + '</span> | <span class="label">Stops:</span> <span class="value">' + result.stops.length + '</span>';
+  summaryDiv.innerHTML = summaryHtml;
 
   // Show step-by-step
   let html = '<div class="rp-step" onclick="rpZoomToNode(\'' + esc(startNode) + '\')">';
@@ -2440,9 +2928,11 @@ const KNOWN_SPECIAL = [
 function rpToggleEditor() {
   RP.editMode = !RP.editMode;
   RP.connectMode = false;
+  RP.waterEdgeMode = false;
   RP.edgeStart = null;
   const btn = document.getElementById('rp-edit-toggle');
   const connectBtn = document.getElementById('rp-edit-connect');
+  const waterBtn = document.getElementById('rp-edit-water');
   const saveBtn = document.getElementById('rp-edit-save');
   const resetBtn = document.getElementById('rp-edit-reset');
   const exportBtn = document.getElementById('rp-edit-export');
@@ -2452,7 +2942,9 @@ function rpToggleEditor() {
   btn.style.color = RP.editMode ? '#fff' : '';
   const show = RP.editMode ? '' : 'none';
   connectBtn.style.display = show;
+  waterBtn.style.display = show;
   rpStyleConnectBtn();
+  rpStyleWaterBtn();
   saveBtn.style.display = show;
   resetBtn.style.display = show;
   exportBtn.style.display = show;
@@ -2480,6 +2972,24 @@ function rpStyleConnectBtn() {
     connectBtn.textContent = 'Connect Nodes';
     connectBtn.style.background = '';
     connectBtn.style.color = '';
+  }
+}
+
+function rpToggleWaterMode() {
+  RP.waterEdgeMode = !RP.waterEdgeMode;
+  rpStyleWaterBtn();
+}
+
+function rpStyleWaterBtn() {
+  const btn = document.getElementById('rp-edit-water');
+  if (RP.waterEdgeMode) {
+    btn.textContent = 'Water: ON';
+    btn.style.background = '#42a5f5';
+    btn.style.color = '#000';
+  } else {
+    btn.textContent = 'Water Route';
+    btn.style.background = '';
+    btn.style.color = '';
   }
 }
 
@@ -2533,9 +3043,13 @@ function rpAddNodePrompt(mx, my) {
 
 function rpToggleEdge(a, b) {
   const edges = RP.graph.edges;
-  const idx = edges.findIndex(([x, y]) => (x === a && y === b) || (x === b && y === a));
-  if (idx >= 0) edges.splice(idx, 1);
-  else edges.push([a, b]);
+  const idx = edges.findIndex(e => (e[0] === a && e[1] === b) || (e[0] === b && e[1] === a));
+  if (idx >= 0) {
+    edges.splice(idx, 1);
+  } else {
+    if (RP.waterEdgeMode) edges.push([a, b, 'water']);
+    else edges.push([a, b]);
+  }
   rpBuildAdj();
   rpDraw();
 }
@@ -2582,12 +3096,9 @@ function rpExportGraph() {
 // --- planRouteFor: called from craft detail overlay ---
 function planRouteFor(itemName) {
   document.getElementById('overlay').classList.remove('active');
+  rpItemList = [itemName];
   switchTab('route-planner');
-  // Set the item dropdown
-  const sel = document.getElementById('rp-item-select');
-  sel.value = itemName;
-  document.getElementById('rp-item-search').value = '';
-  rpFilterItemDropdown('');
+  rpRenderItemList();
 }
 
 // --- Init ---
@@ -2658,8 +3169,13 @@ def main():
     with open(OUTPUT_FILE, 'w', encoding='utf-8') as f:
         f.write(html)
 
+    index_file = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'index.html')
+    with open(index_file, 'w', encoding='utf-8') as f:
+        f.write(html)
+
     print(f"\nDone! Open this file in your browser:")
     print(f"  {OUTPUT_FILE}")
+    print(f"  (also written to {index_file} for GitHub Pages)")
 
 
 if __name__ == '__main__':

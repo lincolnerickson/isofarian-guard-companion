@@ -1,0 +1,5 @@
+# Excel temp/lock files
+~$*.xlsx
+
+# Claude Code project files
+.claude/
