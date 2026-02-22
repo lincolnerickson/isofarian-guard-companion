@@ -66,6 +66,9 @@ Open either file in a browser. No server required.
 4. Embeds everything as JSON inside a single HTML file with inline CSS and JavaScript
 5. The browser app builds cross-reference indices (`materialToEnemies`, `materialToCraft`, `materialToMarket`) at load time
 
-## License
+## Credits
 
-This is an unofficial fan project. The Isofarian Guard is the property of its respective creators.
+- Game data spreadsheet originally created by [iNogle](https://boardgamegeek.com/profile/iNogle) on BoardGameGeek
+- The Isofarian Guard is the property of its respective creators
+
+This is an unofficial fan project.
