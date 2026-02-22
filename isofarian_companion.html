@@ -29,9 +29,24 @@ a:hover { text-decoration: underline; color: #90caf9; }
 
 .header { background: linear-gradient(135deg, var(--bg2), var(--bg3)); padding: 16px 24px; border-bottom: 2px solid var(--accent); display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
 .header h1 { font-size: 1.4rem; color: var(--gold); white-space: nowrap; }
-.search-box { flex: 1; min-width: 200px; max-width: 400px; }
+.search-box { flex: 1; min-width: 200px; max-width: 400px; position: relative; }
 .search-box input { width: 100%; padding: 8px 12px; border-radius: 6px; border: 1px solid var(--bg3); background: var(--bg); color: var(--text); font-size: 0.95rem; }
 .search-box input:focus { outline: none; border-color: var(--accent); }
+.search-dropdown { display: none; position: absolute; top: 100%; left: 0; right: 0; background: var(--bg2); border: 1px solid var(--accent); border-radius: 0 0 8px 8px; max-height: 400px; overflow-y: auto; z-index: 1000; box-shadow: 0 8px 24px rgba(0,0,0,0.5); }
+.search-dropdown.active { display: block; }
+.search-dropdown-item { padding: 8px 12px; cursor: pointer; display: flex; align-items: center; gap: 8px; font-size: 0.9rem; border-bottom: 1px solid rgba(255,255,255,0.05); }
+.search-dropdown-item:last-child { border-bottom: none; }
+.search-dropdown-item:hover { background: rgba(255,255,255,0.08); }
+.search-dropdown-cat { font-size: 0.7rem; font-weight: 600; padding: 2px 6px; border-radius: 3px; text-transform: uppercase; white-space: nowrap; }
+.search-dropdown-cat.cat-enemy { background: var(--red); color: #fff; }
+.search-dropdown-cat.cat-armor { background: #1976d2; color: #fff; }
+.search-dropdown-cat.cat-weapon { background: #7b1fa2; color: #fff; }
+.search-dropdown-cat.cat-accessory { background: var(--orange); color: #1a1a2e; }
+.search-dropdown-cat.cat-item { background: #00897b; color: #fff; }
+.search-dropdown-cat.cat-material { background: var(--green); color: #1a1a2e; }
+.search-dropdown-cat.cat-market { background: var(--gold); color: #1a1a2e; }
+.search-dropdown-cat.cat-stone { background: var(--purple); color: #fff; }
+.search-dropdown-cat.cat-building { background: var(--text2); color: #1a1a2e; }
 
 .tabs { display: flex; background: var(--bg2); border-bottom: 1px solid #333; overflow-x: auto; }
 .tab { padding: 10px 20px; cursor: pointer; color: var(--text2); border-bottom: 3px solid transparent; white-space: nowrap; font-size: 0.9rem; transition: all 0.2s; }
@@ -57,6 +72,7 @@ a:hover { text-decoration: underline; color: #90caf9; }
 .stat.hp .stat-value { color: var(--green); }
 .stat.ap .stat-value { color: var(--orange); }
 .stat.lux .stat-value { color: var(--gold); }
+.lux-icon { display:inline-block; width:14px; height:14px; vertical-align:middle; margin-right:2px; }
 .stat.silver .stat-value { color: var(--silver); }
 
 .rating { color: var(--star); letter-spacing: -2px; font-size: 1rem; }
@@ -116,6 +132,13 @@ a:hover { text-decoration: underline; color: #90caf9; }
 .market-table .town-header { background: var(--bg3); color: var(--gold); text-align: center; }
 .market-table .buy { color: var(--red); }
 .market-table .sell { color: var(--green); }
+.market-rep-row td { text-align: center; background: var(--bg2); padding: 4px 6px; }
+.rep-toggle { display: inline-flex; border-radius: 4px; overflow: hidden; border: 1px solid #444; font-size: 0.75rem; }
+.rep-toggle button { background: var(--bg); color: var(--text2); border: none; padding: 3px 8px; cursor: pointer; transition: all 0.15s; }
+.rep-toggle button.active { background: var(--accent); color: #fff; font-weight: 600; }
+.rep-toggle button:hover:not(.active) { background: rgba(255,255,255,0.1); }
+.market-table td.price-active { font-weight: 600; }
+.market-table td.price-dim { opacity: 0.35; }
 
 /* Route Planner */
 .rp-container { display: flex; gap: 0; height: calc(100vh - 120px); margin: -16px; }
@@ -165,6 +188,14 @@ a:hover { text-decoration: underline; color: #90caf9; }
 
 .rp-editor-bar { display: flex; gap: 6px; align-items: center; margin-top: 12px; padding-top: 10px; border-top: 1px solid #333; flex-wrap: wrap; }
 .rp-search-filter { margin-top: 6px; }
+.rp-item-search-wrap { position: relative; }
+.rp-item-dropdown { display: none; position: absolute; top: 100%; left: 0; right: 0; background: var(--bg2); border: 1px solid var(--accent); border-radius: 0 0 6px 6px; max-height: 250px; overflow-y: auto; z-index: 100; box-shadow: 0 6px 16px rgba(0,0,0,0.5); }
+.rp-item-dropdown.active { display: block; }
+.rp-item-dropdown-item { padding: 6px 10px; cursor: pointer; font-size: 0.85rem; display: flex; align-items: center; gap: 6px; border-bottom: 1px solid rgba(255,255,255,0.05); }
+.rp-item-dropdown-item:last-child { border-bottom: none; }
+.rp-item-dropdown-item:hover { background: rgba(255,255,255,0.08); }
+.rp-item-dropdown-cat { font-size: 0.65rem; font-weight: 600; padding: 1px 5px; border-radius: 3px; text-transform: uppercase; }
+.rp-item-dropdown-group { padding: 4px 10px; font-size: 0.7rem; color: var(--text2); font-weight: 600; text-transform: uppercase; background: var(--bg3); }
 
 .rp-summary { background: var(--bg); border-radius: 6px; padding: 10px; margin-top: 10px; font-size: 0.85rem; }
 .rp-summary .label { color: var(--text2); }
@@ -230,7 +261,8 @@ a:hover { text-decoration: underline; color: #90caf9; }
 <div class="header">
   <h1>The Isofarian Guard 2E Companion</h1>
   <div class="search-box">
-    <input type="text" id="globalSearch" placeholder="Search enemies, items, materials, locations..." />
+    <input type="text" id="globalSearch" placeholder="Search enemies, items, materials, locations..." autocomplete="off" />
+    <div id="searchDropdown" class="search-dropdown"></div>
   </div>
 </div>
 
@@ -321,12 +353,12 @@ a:hover { text-decoration: underline; color: #90caf9; }
       <div class="rp-sidebar">
         <h3>Route Planner</h3>
         <label>Items to Craft</label>
-        <div style="display:flex;gap:6px;align-items:center;">
-          <input type="text" id="rp-item-search" placeholder="Search items..." style="flex:1;" />
+        <div class="rp-item-search-wrap">
+          <input type="text" id="rp-item-search" placeholder="Search items to add..." autocomplete="off" style="width:100%;" />
+          <div id="rp-item-dropdown" class="rp-item-dropdown"></div>
         </div>
-        <div style="display:flex;gap:6px;margin-top:6px;">
-          <select id="rp-item-select" style="flex:1;"><option value="">-- Select an item --</option></select>
-          <button class="rp-btn rp-btn-secondary rp-btn-sm" onclick="rpAddSelectedItem()" style="margin-top:0;white-space:nowrap;">+ Add</button>
+        <div style="display:none;">
+          <select id="rp-item-select"><option value="">-- Select an item --</option></select>
         </div>
         <div class="rp-item-list" id="rp-item-list"><div class="rp-item-list-empty">No items added. Select items above or use "Add to Route" on craft cards.</div></div>
         <button class="rp-btn rp-btn-secondary rp-btn-sm" id="rp-clear-items" onclick="rpClearItems()" style="margin-top:6px;">Clear All Items</button>
@@ -339,6 +371,13 @@ a:hover { text-decoration: underline; color: #90caf9; }
           <option value="3">Chapter 3</option>
           <option value="4">Chapter 4</option>
         </select>
+        <div style="margin:8px 0;">
+          <label style="color:var(--text2);font-size:0.85rem;">Source Types</label>
+          <div class="rep-toggle" style="margin-top:4px;width:100%;display:flex;">
+            <button id="rp-src-all" class="active" onclick="rpSourceMode='all';document.getElementById('rp-src-all').classList.add('active');document.getElementById('rp-src-enemies').classList.remove('active');" style="flex:1;">All Sources</button>
+            <button id="rp-src-enemies" onclick="rpSourceMode='enemies';document.getElementById('rp-src-enemies').classList.add('active');document.getElementById('rp-src-all').classList.remove('active');" style="flex:1;">Enemies Only</button>
+          </div>
+        </div>
         <button class="rp-btn rp-btn-primary" id="rp-calculate" style="width:100%;">Calculate Route</button>
         <div id="rp-route-summary" class="rp-summary" style="display:none;"></div>
         <div id="rp-route-results" class="rp-route-results"></div>
@@ -389,19 +428,21 @@ const DATA = {"enemies": [{"name": "Armored Zhuk", "rating": "★", "attack": "3
 function esc(s) { if (!s) return ''; return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
 function escJs(s) { if (!s) return ''; return String(s).replace(/\\/g,'\\\\').replace(/'/g,"\\'").replace(/"/g,'\\"').replace(/\n/g,'\\n'); }
 
-function formatCost(s) {
+function formatCost(s, prefix) {
   if (!s || s === '-') return s || '';
+  if (prefix === undefined) prefix = '$';
   // Split on newlines, then fix each part: "20RAZDOR/SILNY" -> "$20 Razdor/Silny"
   return s.split(/\n/).map(part => {
     part = part.trim();
     if (!part) return '';
     // Insert space between number and letters: "20RAZDOR" -> "20 RAZDOR"
     part = part.replace(/^(\d+)([A-Za-z])/, '$1 $2');
-    // Add $ before leading number
-    part = part.replace(/^(\d)/, '$$$1');
+    // Add prefix before leading number
+    if (prefix) part = part.replace(/^(\d)/, prefix + '$1');
     return part;
   }).filter(Boolean).join(', ');
 }
+const LUX_ICON = '✨';
 
 function ratingStars(r) {
   if (!r) return '';
@@ -493,7 +534,7 @@ function showDetail(type, identifier) {
       html += '<span class="stat defense"><span class="stat-label">DEF</span><span class="stat-value">' + esc(e.defense) + '</span></span>';
       html += '<span class="stat ap"><span class="stat-label">AP</span><span class="stat-value">' + esc(e.ap) + '</span></span>';
       html += '<span class="stat hp"><span class="stat-label">HP</span><span class="stat-value">' + esc(e.hp) + '</span></span>';
-      if (e.lux) html += '<span class="stat lux"><span class="stat-label">Lux</span><span class="stat-value">' + esc(e.lux) + '</span></span>';
+      if (e.lux) html += '<span class="stat lux"><span class="stat-label">Lux</span><span class="stat-value">' + LUX_ICON + esc(e.lux) + '</span></span>';
       if (e.silver) html += '<span class="stat silver"><span class="stat-label">Silver</span><span class="stat-value">' + esc(e.silver) + '</span></span>';
       html += '</div>';
 
@@ -555,7 +596,7 @@ function showDetail(type, identifier) {
     html += '<div class="stat-row" style="margin-top:8px;">';
     if (item.craftCost && item.craftCost !== '-') html += '<span class="stat lux"><span class="stat-label">Craft</span><span class="stat-value">' + esc(formatCost(item.craftCost)) + '</span></span>';
     if (item.sellPrice && item.sellPrice !== '-') html += '<span class="stat silver"><span class="stat-label">Sell</span><span class="stat-value">' + esc(formatCost(item.sellPrice)) + '</span></span>';
-    if (item.luxCost && item.luxCost !== '-') html += '<span class="stat lux"><span class="stat-label">Lux</span><span class="stat-value">' + esc(formatCost(item.luxCost)) + '</span></span>';
+    if (item.luxCost && item.luxCost !== '-') html += '<span class="stat lux"><span class="stat-label">Lux</span><span class="stat-value">' + LUX_ICON + esc(formatCost(item.luxCost, '')) + '</span></span>';
     html += '</div>';
 
     // Prerequisite
@@ -603,8 +644,16 @@ function showDetail(type, identifier) {
             source = names.map(n => '<a onclick="showDetail(\'enemy\',\'' + escJs(n) + '\')" style="color:var(--red)">' + esc(n) + '</a>').join(', ');
           }
           if (materialToMarket[mat]) {
-            if (source) source += ' | ';
-            source += '<span style="color:var(--green)">Market</span>';
+            let mkt = materialToMarket[mat];
+            let townParts = [];
+            Object.entries(mkt.prices).forEach(([town, p]) => {
+              let price = getMarketBuyPrice(mat, town);
+              if (price) townParts.push(esc(town) + ' ' + esc(price));
+            });
+            if (townParts.length) {
+              if (source) source += ' | ';
+              source += '<span style="color:var(--green)">Market: ' + townParts.join(', ') + '</span>';
+            }
           }
           if (DATA.harvestLocations[mat]) {
             if (source) source += ' | ';
@@ -626,9 +675,12 @@ function showDetail(type, identifier) {
       html += '</table>';
     }
 
-    // Plan Route link
+    // Plan Route / Add to Route links
     if (hasMats) {
-      html += '<div style="margin-top:14px;"><a class="rp-btn rp-btn-primary" style="text-decoration:none;" onclick="planRouteFor(\'' + escJs(item.name) + '\')">Plan Route</a></div>';
+      html += '<div style="margin-top:14px;display:flex;gap:8px;">';
+      html += '<a class="rp-btn rp-btn-primary" style="text-decoration:none;" onclick="planRouteFor(\'' + escJs(item.name) + '\')">Plan Route</a>';
+      html += '<a class="rp-btn" style="text-decoration:none;border:1px solid var(--accent);color:var(--accent);" onclick="addToRoutePlanner(\'' + escJs(item.name) + '\')">+ Add to Route</a>';
+      html += '</div>';
     }
 
     content.innerHTML = html;
@@ -765,7 +817,7 @@ function renderEnemies(filter, search) {
       html += '<span class="stat defense"><span class="stat-label">DEF</span><span class="stat-value">' + esc(e.defense) + '</span></span>';
       html += '<span class="stat ap"><span class="stat-label">AP</span><span class="stat-value">' + esc(e.ap) + '</span></span>';
       html += '<span class="stat hp"><span class="stat-label">HP</span><span class="stat-value">' + esc(e.hp) + '</span></span>';
-      if (e.lux) html += '<span class="stat lux"><span class="stat-label">Lux</span><span class="stat-value">' + esc(e.lux) + '</span></span>';
+      if (e.lux) html += '<span class="stat lux"><span class="stat-label">Lux</span><span class="stat-value">' + LUX_ICON + esc(e.lux) + '</span></span>';
       html += '</div>';
 
       if (e.materialDrops.length) {
@@ -850,7 +902,7 @@ function renderCraftCard(item, type) {
   if (item.stoneSlots) html += '<span class="stat"><span class="stat-label">Slots</span><span class="stat-value">' + esc(item.stoneSlots) + '</span></span>';
   if (item.bonusChip) html += '<span class="stat"><span class="stat-label">Bonus</span><span class="stat-value">' + esc(item.bonusChip) + '</span></span>';
   if (item.craftCost && item.craftCost !== '-') html += '<span class="stat lux"><span class="stat-label">Craft</span><span class="stat-value">' + esc(formatCost(item.craftCost)) + '</span></span>';
-  if (item.luxCost && item.luxCost !== '-') html += '<span class="stat lux"><span class="stat-label">Lux</span><span class="stat-value">' + esc(formatCost(item.luxCost)) + '</span></span>';
+  if (item.luxCost && item.luxCost !== '-') html += '<span class="stat lux"><span class="stat-label">Lux</span><span class="stat-value">' + LUX_ICON + esc(formatCost(item.luxCost, '')) + '</span></span>';
   html += '</div>';
 
   if (item.effect) {
@@ -909,6 +961,7 @@ function renderCraftCard(item, type) {
 function renderMarket() {
   const container = document.getElementById('market-content');
   const towns = ['Mir', 'Razdor', 'Ryba', 'Silny', 'Strofa', 'Vouno', 'Fort Istra Apothecary'];
+  const rep = getMarketRep();
 
   let html = '<table class="market-table"><thead>';
   html += '<tr><th rowspan="2">Item</th><th rowspan="2">Effect</th>';
@@ -917,12 +970,26 @@ function renderMarket() {
   towns.forEach(() => html += '<th class="buy">Buy</th><th class="buy">2Rep</th><th class="sell">Sell</th>');
   html += '</tr></thead><tbody>';
 
+  // Reputation toggle row
+  html += '<tr class="market-rep-row"><td colspan="2" style="text-align:right;color:var(--text2);font-size:0.8rem;font-weight:600;">Reputation</td>';
+  towns.forEach(t => {
+    let r = rep[t] || 0;
+    html += '<td colspan="3"><div class="rep-toggle">';
+    html += '<button class="' + (r === 0 ? 'active' : '') + '" onclick="setTownRep(\'' + escJs(t) + '\',0);renderMarket();refreshCurrentTab();">Base</button>';
+    html += '<button class="' + (r >= 2 ? 'active' : '') + '" onclick="setTownRep(\'' + escJs(t) + '\',2);renderMarket();refreshCurrentTab();">2 Rep</button>';
+    html += '</div></td>';
+  });
+  html += '</tr>';
+
   DATA.market.forEach(item => {
     html += '<tr><td><a onclick="showDetail(\'material\',\'' + escJs(item.name) + '\')" style="font-weight:600;">' + esc(item.name) + '</a></td>';
     html += '<td style="font-size:0.8rem;color:var(--text2);max-width:200px;">' + esc(item.effect) + '</td>';
     towns.forEach(t => {
       let p = item.prices[t] || {};
-      html += '<td>' + esc(p.buy || '-') + '</td><td>' + esc(p.buy2Rep || '-') + '</td><td>' + esc(p.sell || '-') + '</td>';
+      let r = rep[t] || 0;
+      let buyClass = r >= 2 ? 'price-dim' : 'price-active';
+      let buy2Class = r >= 2 ? 'price-active' : 'price-dim';
+      html += '<td class="' + buyClass + '">' + esc(p.buy || '-') + '</td><td class="' + buy2Class + '">' + esc(p.buy2Rep || '-') + '</td><td>' + esc(p.sell || '-') + '</td>';
     });
     html += '</tr>';
   });
@@ -1193,6 +1260,42 @@ function saveCompletedBuildings(arr) {
   localStorage.setItem('tig_buildings_done', JSON.stringify(arr));
 }
 
+function getMarketRep() {
+  try {
+    let raw = localStorage.getItem('tig_market_rep');
+    if (!raw) return {};
+    let obj = JSON.parse(raw);
+    return (typeof obj === 'object' && obj !== null) ? obj : {};
+  } catch(e) { return {}; }
+}
+
+function saveMarketRep(obj) {
+  localStorage.setItem('tig_market_rep', JSON.stringify(obj));
+}
+
+function getTownRep(town) {
+  return getMarketRep()[town] || 0;
+}
+
+function setTownRep(town, level) {
+  let rep = getMarketRep();
+  rep[town] = level;
+  saveMarketRep(rep);
+}
+
+function isPrice(v) { return v && v !== '-'; }
+
+function getMarketBuyPrice(mat, town) {
+  let m = materialToMarket[mat];
+  if (!m) return null;
+  let p = m.prices[town];
+  if (!p) return null;
+  let rep = getTownRep(town);
+  if (rep >= 2 && isPrice(p.buy2Rep)) return p.buy2Rep;
+  if (isPrice(p.buy)) return p.buy;
+  return null;
+}
+
 function toggleBuildingDone(name) {
   let done = getCompletedBuildings();
   let idx = done.indexOf(name);
@@ -1295,8 +1398,116 @@ document.getElementById('acc-filters').addEventListener('click', e => {
   }
 });
 
+function updateSearchDropdown(query) {
+  const dropdown = document.getElementById('searchDropdown');
+  if (!query || query.length < 2) { dropdown.classList.remove('active'); return; }
+  const q = query.toLowerCase();
+  const results = [];
+  const MAX = 20;
+  const seen = {};
+
+  // Enemies (unique names)
+  DATA.enemies.forEach(e => {
+    if (results.length >= MAX || seen['enemy:'+e.name]) return;
+    if (e.name.toLowerCase().includes(q)) {
+      seen['enemy:'+e.name] = 1;
+      results.push({name: e.name, cat: 'Enemy', cls: 'cat-enemy', type: 'enemy', id: e.name});
+    }
+  });
+
+  // Armor & Weapons
+  DATA.armorWeapons.forEach(i => {
+    if (results.length >= MAX) return;
+    if (i.name.toLowerCase().includes(q)) {
+      let isWeapon = (i.type||'').toLowerCase().includes('weapon') || (i.type||'').toLowerCase().includes('shield');
+      results.push({name: i.name, cat: isWeapon ? 'Weapon' : 'Armor', cls: isWeapon ? 'cat-weapon' : 'cat-armor', type: 'craft', id: i.name});
+    }
+  });
+
+  // Accessories
+  DATA.accessories.forEach(i => {
+    if (results.length >= MAX) return;
+    if (i.name.toLowerCase().includes(q)) {
+      let isItem = (i.type||'').toLowerCase().includes('item');
+      results.push({name: i.name, cat: isItem ? 'Item' : 'Accessory', cls: isItem ? 'cat-item' : 'cat-accessory', type: 'craft', id: i.name});
+    }
+  });
+
+  // Materials (harvest locations keys)
+  Object.keys(DATA.harvestLocations).forEach(mat => {
+    if (results.length >= MAX) return;
+    if (mat.toLowerCase().includes(q)) {
+      results.push({name: mat, cat: 'Material', cls: 'cat-material', type: 'material', id: mat});
+    }
+  });
+
+  // Market items
+  DATA.market.forEach(i => {
+    if (results.length >= MAX || seen['market:'+i.name]) return;
+    if (i.name.toLowerCase().includes(q)) {
+      seen['market:'+i.name] = 1;
+      results.push({name: i.name, cat: 'Market', cls: 'cat-market', type: 'material', id: i.name});
+    }
+  });
+
+  // Speaking Stones
+  if (DATA.speakingStones) DATA.speakingStones.forEach(s => {
+    if (results.length >= MAX) return;
+    if (s.name.toLowerCase().includes(q)) {
+      results.push({name: s.name, cat: 'Stone', cls: 'cat-stone', type: 'stone', id: s.name});
+    }
+  });
+
+  // Buildings
+  if (DATA.buildings) DATA.buildings.forEach(b => {
+    if (results.length >= MAX) return;
+    if (b.name.toLowerCase().includes(q)) {
+      results.push({name: b.name, cat: 'Building', cls: 'cat-building', type: 'building', id: b.name});
+    }
+  });
+
+  if (!results.length) { dropdown.classList.remove('active'); return; }
+
+  dropdown.innerHTML = results.map(r =>
+    '<div class="search-dropdown-item" data-type="' + esc(r.type) + '" data-id="' + esc(r.id) + '">' +
+    '<span class="search-dropdown-cat ' + r.cls + '">' + esc(r.cat) + '</span>' +
+    '<span>' + esc(r.name) + '</span></div>'
+  ).join('');
+  dropdown.classList.add('active');
+}
+
+document.getElementById('searchDropdown').addEventListener('click', e => {
+  const item = e.target.closest('.search-dropdown-item');
+  if (!item) return;
+  const type = item.dataset.type;
+  const id = item.dataset.id;
+  document.getElementById('searchDropdown').classList.remove('active');
+  if (type === 'building') {
+    // Switch to buildings tab
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    document.querySelector('.tab[data-tab="buildings"]').classList.add('active');
+    document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+    document.getElementById('buildings').classList.add('active');
+    renderBuildings();
+  } else {
+    showDetail(type, id);
+  }
+});
+
+document.getElementById('globalSearch').addEventListener('focusin', () => {
+  const q = document.getElementById('globalSearch').value.trim();
+  if (q.length >= 2) updateSearchDropdown(q);
+});
+
+document.addEventListener('click', e => {
+  if (!e.target.closest('.search-box')) {
+    document.getElementById('searchDropdown').classList.remove('active');
+  }
+});
+
 document.getElementById('globalSearch').addEventListener('input', e => {
   searchQuery = e.target.value.trim();
+  updateSearchDropdown(searchQuery);
   refreshCurrentTab();
 });
 
@@ -1381,21 +1592,39 @@ function rpIsBoatDockBuilt() {
   return getCompletedBuildings().some(b => b.toLowerCase().includes('boat dock'));
 }
 
+const WATER_DOCKS = new Set(['101', '79', '56', '21', '11']);
+const WATER_ONLY_NODES = new Set(['82', '50', '42', '27', '39', '47', '66', '65', '89', '80']);
+
 function rpBuildAdj() {
   RP.adj = {};
   const nodes = RP.graph.nodes;
   const boatOk = rpIsBoatDockBuilt();
   for (const nid in nodes) RP.adj[nid] = [];
+
   RP.graph.edges.forEach(e => {
     const [a, b] = e;
     const isWater = e[2] === 'water';
     if (isWater && !boatOk) return;
-    if (nodes[a] && nodes[b]) {
-      if (!RP.adj[a]) RP.adj[a] = [];
-      if (!RP.adj[b]) RP.adj[b] = [];
-      if (!RP.adj[a].includes(b)) RP.adj[a].push(b);
-      if (!RP.adj[b].includes(a)) RP.adj[b].push(a);
+    if (!nodes[a] || !nodes[b]) return;
+
+    // Non-water edges: skip if either endpoint is a water-only node
+    // (water-only nodes can only be reached via water edges through docks)
+    if (!isWater) {
+      if (WATER_ONLY_NODES.has(a) || WATER_ONLY_NODES.has(b)) return;
     }
+
+    // Water edges: only allow if at least one endpoint is a dock or
+    // the traveler is already on the water network (both are water nodes)
+    if (isWater) {
+      const aOnWater = WATER_DOCKS.has(a) || WATER_ONLY_NODES.has(a);
+      const bOnWater = WATER_DOCKS.has(b) || WATER_ONLY_NODES.has(b);
+      if (!aOnWater || !bOnWater) return;
+    }
+
+    if (!RP.adj[a]) RP.adj[a] = [];
+    if (!RP.adj[b]) RP.adj[b] = [];
+    if (!RP.adj[a].includes(b)) RP.adj[a].push(b);
+    if (!RP.adj[b].includes(a)) RP.adj[b].push(a);
   });
   RP.distMatrix = null; // invalidate cache
 }
@@ -1467,7 +1696,7 @@ function rpGetMaterialSources(materialName, chapter) {
     seen.forEach(nid => sources.push(nid));
   }
   // Market: find towns that sell this material
-  if (materialToMarket[materialName]) {
+  if (rpSourceMode !== 'enemies' && materialToMarket[materialName]) {
     const m = materialToMarket[materialName];
     Object.keys(m.prices).forEach(town => {
       if (m.prices[town].buy) {
@@ -1478,7 +1707,7 @@ function rpGetMaterialSources(materialName, chapter) {
     });
   }
   // Harvest nodes
-  if (DATA.harvestLocations[materialName]) {
+  if (rpSourceMode !== 'enemies' && DATA.harvestLocations[materialName]) {
     const locStr = String(DATA.harvestLocations[materialName]);
     locStr.split(',').forEach(part => {
       const p = part.trim();
@@ -2082,6 +2311,25 @@ function rpBindEvents() {
   document.getElementById('rp-item-search').addEventListener('input', e => {
     rpFilterItemDropdown(e.target.value);
   });
+  document.getElementById('rp-item-dropdown').addEventListener('click', e => {
+    const item = e.target.closest('.rp-item-dropdown-item');
+    if (!item) return;
+    const name = item.dataset.name;
+    if (name) {
+      rpAddItemByName(name);
+      document.getElementById('rp-item-search').value = '';
+      document.getElementById('rp-item-dropdown').classList.remove('active');
+    }
+  });
+  document.getElementById('rp-item-search').addEventListener('focusin', () => {
+    const q = document.getElementById('rp-item-search').value.trim();
+    if (q.length >= 1) rpFilterItemDropdown(q);
+  });
+  document.addEventListener('click', e => {
+    if (!e.target.closest('.rp-item-search-wrap')) {
+      document.getElementById('rp-item-dropdown').classList.remove('active');
+    }
+  });
 }
 
 function rpShowTooltip(nid, cx, cy) {
@@ -2132,32 +2380,37 @@ function rpPopulateItems() {
 }
 
 function rpFilterItemDropdown(query) {
-  const sel = document.getElementById('rp-item-select');
-  const q = query.toLowerCase();
-  const prev = sel.value;
+  const dd = document.getElementById('rp-item-dropdown');
+  const q = (query || '').toLowerCase();
+  if (!q || q.length < 1) { dd.classList.remove('active'); return; }
   const groups = { 'Armor': [], 'Weapon': [], 'Accessory': [], 'Item': [], 'Building': [] };
+  const catColors = { 'Armor': 'cat-armor', 'Weapon': 'cat-weapon', 'Accessory': 'cat-accessory', 'Item': 'cat-item', 'Building': 'cat-building' };
   DATA.armorWeapons.forEach(i => {
     const t = (i.type || '').includes('Armor') ? 'Armor' : 'Weapon';
-    if (!q || i.name.toLowerCase().includes(q)) groups[t].push(i.name);
+    if (i.name.toLowerCase().includes(q)) groups[t].push(i.name);
   });
   DATA.accessories.forEach(i => {
     const t = (i.type || '').includes('Accessory') ? 'Accessory' : 'Item';
-    if (!q || i.name.toLowerCase().includes(q)) groups[t].push(i.name);
+    if (i.name.toLowerCase().includes(q)) groups[t].push(i.name);
   });
   DATA.buildings.forEach(i => {
-    if (!q || i.name.toLowerCase().includes(q)) groups['Building'].push(i.name);
+    if (i.name.toLowerCase().includes(q)) groups['Building'].push(i.name);
   });
-  let html = '<option value="">-- Select an item --</option>';
+  let html = '';
+  let total = 0;
   for (const [group, items] of Object.entries(groups)) {
     if (!items.length) continue;
-    html += '<optgroup label="' + esc(group) + '">';
+    html += '<div class="rp-item-dropdown-group">' + esc(group) + '</div>';
     items.sort().forEach(name => {
-      html += '<option value="' + esc(name) + '">' + esc(name) + '</option>';
+      html += '<div class="rp-item-dropdown-item" data-name="' + esc(name) + '">';
+      html += '<span class="search-dropdown-cat ' + (catColors[group] || '') + '">' + esc(group) + '</span>';
+      html += '<span>' + esc(name) + '</span></div>';
+      total++;
     });
-    html += '</optgroup>';
   }
-  sel.innerHTML = html;
-  sel.value = prev;
+  if (!total) { dd.classList.remove('active'); return; }
+  dd.innerHTML = html;
+  dd.classList.add('active');
 }
 
 function rpPopulateStartLocations() {
@@ -2179,6 +2432,7 @@ function rpPopulateStartLocations() {
 
 // --- Multi-item route list ---
 let rpItemList = [];
+let rpSourceMode = 'all'; // 'all' or 'enemies'
 
 function rpRenderItemList() {
   const el = document.getElementById('rp-item-list');
@@ -2209,6 +2463,13 @@ function rpRemoveItem(idx) {
 function rpClearItems() {
   rpItemList = [];
   rpRenderItemList();
+}
+
+function rpAddItemByName(itemName) {
+  if (!rpItemList.includes(itemName)) {
+    rpItemList.push(itemName);
+    rpRenderItemList();
+  }
 }
 
 function addToRoutePlanner(itemName) {
