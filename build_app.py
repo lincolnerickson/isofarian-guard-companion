@@ -461,23 +461,6 @@ def parse_prereqs(wb):
 # ---------------------------------------------------------------------------
 MAP_GRAPH = {
     "nodes": {
-        # --- Ice Caves (IC) - underground, displayed at top of map ---
-        "ic_old_armory": {"x": 1400, "y": 100, "name": "Old Armory", "type": "special"},
-        "ic_ossuary": {"x": 1600, "y": 100, "name": "Ossuary", "type": "special"},
-        "ic_glacial_worm_bones": {"x": 1050, "y": 180, "name": "Glacial Worm Bones", "type": "special"},
-        "ic_frozen_lake": {"x": 1300, "y": 170, "name": "Frozen Lake", "type": "special"},
-        "ic_hall_of_ice": {"x": 1750, "y": 160, "name": "Hall of Ice", "type": "special"},
-        "ic_abandoned_quarters": {"x": 1500, "y": 250, "name": "Abandoned Quarters", "type": "special"},
-        # --- Frozen Wastes (FW) - snowy mountain surface ---
-        "fw_mount_nebesa": {"x": 2100, "y": 220, "name": "Mount Nebesa", "type": "special"},
-        "fw_ice_fields": {"x": 1700, "y": 300, "name": "Ice Fields", "type": "special"},
-        "fw_room_of_columns": {"x": 1350, "y": 320, "name": "Room of Columns", "type": "special"},
-        "fw_reka_glacier": {"x": 1100, "y": 370, "name": "Reka Glacier", "type": "special"},
-        "fw_skryvat_temple": {"x": 850, "y": 340, "name": "Skryvat Temple", "type": "special"},
-        "fw_vniz_path": {"x": 1450, "y": 430, "name": "Vniz Path", "type": "special"},
-        "fw_urok_span": {"x": 1750, "y": 450, "name": "Urok Span", "type": "special"},
-        "fw_uchitel_span": {"x": 1200, "y": 470, "name": "Uchitel Span", "type": "special"},
-        "fw_broken_lands": {"x": 600, "y": 460, "name": "The Broken Lands", "type": "special"},
         # --- Numbered nodes (1-108) - positions from in-app editor ---
         "1": {"x": 1106, "y": 743, "name": "1"},
         "2": {"x": 1439, "y": 650, "name": "2"},
@@ -599,30 +582,6 @@ MAP_GRAPH = {
         "strofa": {"x": 1253, "y": 2304, "name": "Strofa", "type": "town"},
     },
     "edges": [
-        # === Ice Caves (IC) internal ===
-        ["ic_old_armory", "ic_ossuary"],
-        ["ic_old_armory", "ic_glacial_worm_bones"],
-        ["ic_glacial_worm_bones", "ic_frozen_lake"],
-        ["ic_frozen_lake", "ic_hall_of_ice"],
-        ["ic_frozen_lake", "ic_abandoned_quarters"],
-        ["ic_hall_of_ice", "ic_ossuary"],
-        ["ic_abandoned_quarters", "ic_ossuary"],
-        # === Frozen Wastes (FW) internal ===
-        ["fw_mount_nebesa", "fw_ice_fields"],
-        ["fw_ice_fields", "fw_room_of_columns"],
-        ["fw_ice_fields", "fw_urok_span"],
-        ["fw_room_of_columns", "fw_reka_glacier"],
-        ["fw_room_of_columns", "fw_vniz_path"],
-        ["fw_reka_glacier", "fw_skryvat_temple"],
-        ["fw_skryvat_temple", "fw_broken_lands"],
-        ["fw_broken_lands", "fw_uchitel_span"],
-        ["fw_vniz_path", "fw_urok_span"],
-        ["fw_vniz_path", "fw_uchitel_span"],
-        # === IC / FW gateways to main map ===
-        ["ic_abandoned_quarters", "1"],
-        ["fw_vniz_path", "1"],
-        ["fw_uchitel_span", "2"],
-        ["fw_broken_lands", "6"],
         # === Main map edges (from in-app editor) ===
         ["102", "99"],
         ["99", "97"],
