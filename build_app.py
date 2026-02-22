@@ -880,6 +880,9 @@ a:hover { text-decoration: underline; color: #90caf9; }
 .search-box { flex: 1; min-width: 200px; max-width: 400px; position: relative; }
 .search-box input { width: 100%; padding: 8px 12px; border-radius: 6px; border: 1px solid var(--bg3); background: var(--bg); color: var(--text); font-size: 0.95rem; }
 .search-box input:focus { outline: none; border-color: var(--accent); }
+.backup-btns { display: flex; gap: 6px; align-items: center; }
+.backup-btn { background: var(--bg); border: 1px solid #444; color: var(--text2); padding: 6px 10px; border-radius: 6px; font-size: 0.78rem; cursor: pointer; white-space: nowrap; transition: all 0.15s; }
+.backup-btn:hover { border-color: var(--accent); color: var(--text); }
 .search-dropdown { display: none; position: absolute; top: 100%; left: 0; right: 0; background: var(--bg2); border: 1px solid var(--accent); border-radius: 0 0 8px 8px; max-height: 400px; overflow-y: auto; z-index: 1000; box-shadow: 0 8px 24px rgba(0,0,0,0.5); }
 .search-dropdown.active { display: block; }
 .search-dropdown-item { padding: 8px 12px; cursor: pointer; display: flex; align-items: center; gap: 8px; font-size: 0.9rem; border-bottom: 1px solid rgba(255,255,255,0.05); }
@@ -1122,6 +1125,11 @@ a:hover { text-decoration: underline; color: #90caf9; }
   <div class="search-box">
     <input type="text" id="globalSearch" placeholder="Search enemies, items, materials, locations..." autocomplete="off" />
     <div id="searchDropdown" class="search-dropdown"></div>
+  </div>
+  <div class="backup-btns">
+    <button class="backup-btn" onclick="exportBackup()">Save Backup</button>
+    <button class="backup-btn" onclick="document.getElementById('import-backup').click()">Load Backup</button>
+    <input type="file" id="import-backup" accept=".json" style="display:none;" onchange="importBackup(event)" />
   </div>
 </div>
 
@@ -2124,6 +2132,46 @@ function clearAllResources() {
   saveResources({});
   renderResources();
   refreshCurrentTab();
+}
+
+const BACKUP_KEYS = ['tig_heroes', 'tig_resources', 'tig_buildings_done', 'tig_market_rep', 'tig_map_graph'];
+
+function exportBackup() {
+  const backup = {};
+  BACKUP_KEYS.forEach(key => {
+    const val = localStorage.getItem(key);
+    if (val !== null) backup[key] = JSON.parse(val);
+  });
+  backup._meta = { app: 'TIG 2E Companion', date: new Date().toISOString() };
+  const blob = new Blob([JSON.stringify(backup, null, 2)], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'tig-companion-backup-' + new Date().toISOString().slice(0, 10) + '.json';
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+function importBackup(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    try {
+      const backup = JSON.parse(e.target.result);
+      if (!backup || typeof backup !== 'object') { alert('Invalid backup file.'); return; }
+      const keys = BACKUP_KEYS.filter(k => backup[k] !== undefined);
+      if (!keys.length) { alert('No recognized data found in backup file.'); return; }
+      if (!confirm('Restore backup? This will overwrite your current data:\\n\\n' + keys.map(k => '  ' + k).join('\\n') + '\\n\\nThis cannot be undone.')) return;
+      keys.forEach(k => localStorage.setItem(k, JSON.stringify(backup[k])));
+      alert('Backup restored! Reloading...');
+      location.reload();
+    } catch(err) {
+      alert('Error reading backup file: ' + err.message);
+    }
+  };
+  reader.readAsText(file);
+  event.target.value = '';
 }
 
 function getCompletedBuildings() {
