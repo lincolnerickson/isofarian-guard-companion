@@ -1342,7 +1342,7 @@ function buildIndices() {
     if (item.speakingStone) {
       let sName = item.speakingStone.replace(/\s*x\d+/i, '');
       if (!materialToCraft[sName]) materialToCraft[sName] = [];
-      materialToCraft[sName].push({ name: item.name, type: 'armor-weapon', item });
+      materialToCraft[sName].push({ name: item.name, type: 'armor-weapon', item, usedAs: 'stone' });
     }
   });
 
@@ -1357,7 +1357,7 @@ function buildIndices() {
     if (item.speakingStone) {
       let sName = item.speakingStone.replace(/\s*x\d+/i, '');
       if (!materialToCraft[sName]) materialToCraft[sName] = [];
-      materialToCraft[sName].push({ name: item.name, type: 'accessory', item });
+      materialToCraft[sName].push({ name: item.name, type: 'accessory', item, usedAs: 'stone' });
     }
   });
 
@@ -1601,14 +1601,17 @@ function showDetail(type, identifier) {
       }
     }
 
-    // Used in crafting
+    // Used in crafting (exclude speaking stone references)
     if (materialToCraft[identifier]) {
-      html += '<h3>Used to Craft</h3>';
-      html += '<div class="tag-list" style="gap:6px;">';
-      materialToCraft[identifier].forEach(c => {
-        html += '<a class="tag craft" onclick="showDetail(\'craft\',\'' + escJs(c.name) + '\')">' + esc(c.name) + '</a>';
-      });
-      html += '</div>';
+      let matCrafts = materialToCraft[identifier].filter(c => c.usedAs !== 'stone');
+      if (matCrafts.length) {
+        html += '<h3>Used to Craft</h3>';
+        html += '<div class="tag-list" style="gap:6px;">';
+        matCrafts.forEach(c => {
+          html += '<a class="tag craft" onclick="showDetail(\'craft\',\'' + escJs(c.name) + '\')">' + esc(c.name) + '</a>';
+        });
+        html += '</div>';
+      }
     }
 
     content.innerHTML = html;
@@ -1632,14 +1635,17 @@ function showDetail(type, identifier) {
       }
     }
 
-    // Used in crafting
+    // Used in crafting (only show items that use this as a speaking stone)
     if (materialToCraft[identifier]) {
-      html += '<h3>Used to Craft</h3>';
-      html += '<div class="tag-list" style="gap:6px;">';
-      materialToCraft[identifier].forEach(c => {
-        html += '<a class="tag craft" onclick="showDetail(\'craft\',\'' + escJs(c.name) + '\')">' + esc(c.name) + '</a>';
-      });
-      html += '</div>';
+      let stoneCrafts = materialToCraft[identifier].filter(c => c.usedAs === 'stone');
+      if (stoneCrafts.length) {
+        html += '<h3>Used to Craft</h3>';
+        html += '<div class="tag-list" style="gap:6px;">';
+        stoneCrafts.forEach(c => {
+          html += '<a class="tag craft" onclick="showDetail(\'craft\',\'' + escJs(c.name) + '\')">' + esc(c.name) + '</a>';
+        });
+        html += '</div>';
+      }
     }
 
     content.innerHTML = html;
@@ -2526,6 +2532,7 @@ const WATER_ONLY_NODES = new Set(['82', '50', '42', '27', '39', '47', '66', '65'
 
 function rpBuildAdj() {
   RP.adj = {};
+  rpInvalidateSpecialAreaCache();
   const nodes = RP.graph.nodes;
   const boatOk = rpIsBoatDockBuilt();
   for (const nid in nodes) RP.adj[nid] = [];
@@ -2628,36 +2635,65 @@ function rpGetMaterialSources(materialName, chapter) {
   if (rpSourceMode !== 'enemies' && materialToMarket[materialName]) {
     const m = materialToMarket[materialName];
     Object.keys(m.prices).forEach(town => {
-      if (m.prices[town].buy) {
+      if (isPrice(m.prices[town].buy) || isPrice(m.prices[town].buy2Rep)) {
         // Map town name to node ID
         const tid = rpTownId(town);
         if (tid && nodes[tid]) sources.push(tid);
       }
     });
   }
-  // Harvest nodes
-  if (rpSourceMode !== 'enemies' && DATA.harvestLocations[materialName]) {
+  // Harvest nodes (always included)
+  if (DATA.harvestLocations[materialName]) {
     const locStr = String(DATA.harvestLocations[materialName]);
     locStr.split(',').forEach(part => {
       const p = part.trim();
       const num = parseInt(p);
-      if (!isNaN(num) && nodes[String(num)]) sources.push(String(num));
+      if (!isNaN(num) && nodes[String(num)]) {
+        sources.push(String(num));
+      } else if (p) {
+        // Try matching text location to a node name
+        // e.g. "Ice Caves: Crystal Vein" -> "IC - Crystal Vein"
+        let nid = rpSpecialAreaId(p);
+        if (!nid) {
+          // Try converting "Ice Caves: X" -> "IC - X", "Frozen Wastes: X" -> "FW - X"
+          const converted = p.replace(/^Ice Caves:\s*/i, 'IC - ').replace(/^Frozen Wastes:\s*/i, 'FW - ');
+          nid = rpSpecialAreaId(converted);
+        }
+        if (nid && nodes[nid]) {
+          sources.push(nid);
+        } else {
+          const expected = p.replace(/^Ice Caves:\s*/i, 'IC - ').replace(/^Frozen Wastes:\s*/i, 'FW - ');
+          console.warn('[Route] Harvest location "' + p + '" for ' + materialName + ' not found. Add a node named "' + expected + '" and connect it to the map.');
+        }
+      }
     });
   }
   return [...new Set(sources)];
 }
 
-const _specialAreaMap = {
-  "FW - Ice Fields": "fw_ice_fields", "FW - Mount Nebesa": "fw_mount_nebesa",
-  "FW - Reka Glacier": "fw_reka_glacier", "FW - Room of Columns": "fw_room_of_columns",
-  "FW - Skryvat Temple": "fw_skryvat_temple", "FW - The Broken Lands": "fw_broken_lands",
-  "FW - Uchitel Span": "fw_uchitel_span", "FW - Urok Span": "fw_urok_span",
-  "FW - Vniz Path": "fw_vniz_path",
-  "IC - Abandoned Quarters": "ic_abandoned_quarters", "IC - Abandoned Quartes": "ic_abandoned_quarters",
-  "IC - Frozen Lake": "ic_frozen_lake", "IC - Glacial Worm Bones": "ic_glacial_worm_bones",
-  "IC - Hall of Ice": "ic_hall_of_ice", "IC - Old Armory": "ic_old_armory", "IC - Ossuary": "ic_ossuary",
-};
-function rpSpecialAreaId(name) { return _specialAreaMap[name] || null; }
+let _specialAreaCache = null;
+function _buildSpecialAreaCache() {
+  _specialAreaCache = {};
+  const nodes = RP.graph ? RP.graph.nodes : {};
+  for (const [nid, n] of Object.entries(nodes)) {
+    if (!n.name || /^\d+$/.test(nid)) continue; // skip numbered nodes
+    const nameLower = n.name.toLowerCase().trim();
+    _specialAreaCache[nameLower] = nid;
+    // Also index without prefix (e.g. "The Broken Lands" for "FW - The Broken Lands")
+    const dashIdx = nameLower.indexOf(' - ');
+    if (dashIdx >= 0) {
+      _specialAreaCache[nameLower.substring(dashIdx + 3).trim()] = nid;
+    }
+  }
+  // Hardcoded aliases for typos in the data
+  _specialAreaCache['ic - abandoned quartes'] = _specialAreaCache['ic - abandoned quarters'] || null;
+}
+function rpSpecialAreaId(name) {
+  if (!_specialAreaCache) _buildSpecialAreaCache();
+  const key = name.toLowerCase().trim();
+  return _specialAreaCache[key] || null;
+}
+function rpInvalidateSpecialAreaCache() { _specialAreaCache = null; }
 
 function rpTownId(townName) {
   const map = {
@@ -2696,7 +2732,16 @@ function rpComputeRoute(itemName, startNode, chapter) {
   // Check if all materials have at least one source
   const unreachable = materialsNeeded.filter(m => !matSources[m.name].length);
   if (unreachable.length) {
-    return { error: 'No accessible sources for: ' + unreachable.map(m => m.name).join(', ') };
+    let details = unreachable.map(m => {
+      let hint = m.name;
+      if (DATA.harvestLocations[m.name]) {
+        let loc = String(DATA.harvestLocations[m.name]);
+        let expected = loc.replace(/^Ice Caves:\s*/i, 'IC - ').replace(/^Frozen Wastes:\s*/i, 'FW - ');
+        hint += ' (add node "' + expected + '" to map)';
+      }
+      return hint;
+    }).join(', ');
+    return { error: 'No accessible sources for: ' + details };
   }
 
   // Greedy nearest-unvisited-source heuristic
@@ -2810,7 +2855,16 @@ function rpComputeRouteMulti(itemNames, startNode, chapter) {
   // Check if all materials have at least one source
   const unreachable = materialsNeeded.filter(m => !matSources[m.name].length);
   if (unreachable.length) {
-    return { error: 'No accessible sources for: ' + unreachable.map(m => m.name).join(', ') };
+    let details = unreachable.map(m => {
+      let hint = m.name;
+      if (DATA.harvestLocations[m.name]) {
+        let loc = String(DATA.harvestLocations[m.name]);
+        let expected = loc.replace(/^Ice Caves:\s*/i, 'IC - ').replace(/^Frozen Wastes:\s*/i, 'FW - ');
+        hint += ' (add node "' + expected + '" to map)';
+      }
+      return hint;
+    }).join(', ');
+    return { error: 'No accessible sources for: ' + details };
   }
 
   // Greedy nearest-unvisited-source heuristic
@@ -3649,13 +3703,47 @@ function rpAddNodePrompt(mx, my) {
   const specMatch = KNOWN_SPECIAL.find(s => s.id === nid || s.id === nidLower || s.name.toLowerCase() === nid.toLowerCase());
   if (specMatch) nid = specMatch.id;
 
-  if (RP.graph.nodes[nid]) { alert('Node "' + nid + '" already exists. Drag it to move.'); return; }
+  // If not matched and looks like a custom location name, generate a proper node ID
+  // and set the name to match game data format (e.g. "Tumani Village" -> id: "fw_tumani_village", name: "FW - Tumani Village")
+  let customPrefix = null;
+  if (!townMatch && !specMatch && isNaN(parseInt(nid))) {
+    // Check if user already included a prefix like "FW - " or "IC - "
+    const prefixMatch = nid.match(/^(FW|IC)\s*-\s*(.+)$/i);
+    if (prefixMatch) {
+      customPrefix = prefixMatch[1].toUpperCase();
+      nid = prefixMatch[2].trim();
+    }
+  }
 
-  // Determine type and name
+  if (!townMatch && !specMatch && isNaN(parseInt(nid)) && !customPrefix) {
+    // Ask if this is a FW, IC, or other area
+    const areaType = prompt('Is this a special area? Enter prefix:\\n  FW = Frozen Wastes\\n  IC = Ice Caves\\n  (leave blank for generic node)', '');
+    if (areaType !== null && areaType.trim()) {
+      customPrefix = areaType.trim().toUpperCase();
+      if (customPrefix !== 'FW' && customPrefix !== 'IC') {
+        alert('Prefix must be FW or IC.'); return;
+      }
+    }
+  }
+
   let nodeType = undefined;
   let nodeName = nid;
-  if (townMatch) { nodeType = 'town'; nodeName = townMatch.name; }
-  if (specMatch) { nodeType = 'special'; nodeName = specMatch.name; }
+
+  if (townMatch) { nodeType = 'town'; nodeName = townMatch.name; nid = townMatch.id; }
+  else if (specMatch) { nodeType = 'special'; nodeName = specMatch.name; nid = specMatch.id; }
+  else if (customPrefix) {
+    nodeName = customPrefix + ' - ' + nid;
+    nid = customPrefix.toLowerCase() + '_' + nid.toLowerCase().replace(/[\s\-]+/g, '_');
+    nodeType = 'special';
+  } else if (isNaN(parseInt(nid))) {
+    // Generic named node — generate a safe ID
+    let safeId = nid.toLowerCase().replace(/[\s\-]+/g, '_');
+    if (RP.graph.nodes[safeId]) { alert('Node "' + safeId + '" already exists.'); return; }
+    nodeName = nid;
+    nid = safeId;
+  }
+
+  if (RP.graph.nodes[nid]) { alert('Node "' + nid + '" already exists. Drag it to move.'); return; }
 
   const nodeData = { x: mx, y: my, name: nodeName, chapters: [], enemies: [], resources: [] };
   if (nodeType) nodeData.type = nodeType;
